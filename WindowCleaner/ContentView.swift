@@ -2,6 +2,22 @@ import os
 import SwiftData
 import SwiftUI
 
+// MARK: - View Mode
+
+enum ContentViewMode: String, CaseIterable, Identifiable {
+    case apps = "Apps"
+    case insights = "Insights"
+
+    var id: String { rawValue }
+
+    var icon: String {
+        switch self {
+        case .apps: "macwindow.on.rectangle"
+        case .insights: "chart.bar.xaxis"
+        }
+    }
+}
+
 // MARK: - ContentView
 
 /// Main content view for WindowCleaner showing running applications.
@@ -15,21 +31,20 @@ struct ContentView: View {
 
     @State private var viewModel = AppTrackingViewModel()
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @State private var viewMode: ContentViewMode = .apps
 
     // MARK: - Body
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
-            AppListView(viewModel: viewModel)
-                .navigationSplitViewColumnWidth(
-                    min: 280,
-                    ideal: 320,
-                    max: 400
-                )
-        } detail: {
-            detailContent
+        Group {
+            switch viewMode {
+            case .apps:
+                appsView
+            case .insights:
+                InsightsView()
+            }
         }
-        .navigationTitle("Window Cleaner")
+        .navigationTitle(viewMode == .apps ? "Window Cleaner" : "Usage Insights")
         .toolbar {
             toolbarContent
         }
@@ -61,6 +76,30 @@ struct ContentView: View {
         } message: {
             Text("This will quit \(viewModel.pendingCleanupApps.count) stale apps, freeing approximately \(viewModel.potentialSavings) of memory.")
         }
+        // Handle menu commands
+        .onReceive(NotificationCenter.default.publisher(for: .refreshContent)) { _ in
+            viewModel.refresh()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .cleanUpStaleApps)) { _ in
+            if viewModel.staleAppCount > 0 {
+                viewModel.prepareCleanup()
+            }
+        }
+    }
+
+    // MARK: - Apps View
+
+    private var appsView: some View {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            AppListView(viewModel: viewModel)
+                .navigationSplitViewColumnWidth(
+                    min: 280,
+                    ideal: 320,
+                    max: 400
+                )
+        } detail: {
+            detailContent
+        }
     }
 
     // MARK: - Detail Content
@@ -87,6 +126,10 @@ struct ContentView: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigation) {
+            viewModePicker
+        }
+
         ToolbarItem(placement: .primaryAction) {
             systemMemoryIndicator
         }
@@ -98,10 +141,11 @@ struct ContentView: View {
                 Image(systemName: "arrow.clockwise")
             }
             .help("Refresh app list")
+            .disabled(viewMode == .insights)
         }
 
         ToolbarItem(placement: .primaryAction) {
-            if viewModel.staleAppCount > 0 {
+            if viewModel.staleAppCount > 0 && viewMode == .apps {
                 Button {
                     viewModel.prepareCleanup()
                 } label: {
@@ -110,6 +154,17 @@ struct ContentView: View {
                 .help("Quit \(viewModel.staleAppCount) stale apps")
             }
         }
+    }
+
+    private var viewModePicker: some View {
+        Picker("View", selection: $viewMode) {
+            ForEach(ContentViewMode.allCases) { mode in
+                Label(mode.rawValue, systemImage: mode.icon)
+                    .tag(mode)
+            }
+        }
+        .pickerStyle(.segmented)
+        .frame(width: 180)
     }
 
     private var systemMemoryIndicator: some View {

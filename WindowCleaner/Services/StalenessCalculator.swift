@@ -1,4 +1,14 @@
 import Foundation
+import os
+
+// MARK: - Double Extension
+
+private extension Double {
+    /// Returns self if non-zero, otherwise returns the default value
+    func nonZeroOr(_ defaultValue: Double) -> Double {
+        self != 0 ? self : defaultValue
+    }
+}
 
 // MARK: - Staleness Calculator
 
@@ -14,26 +24,38 @@ final class StalenessCalculator {
     // MARK: - Configuration
 
     /// Weight for inactivity time in the score (0-1)
-    var inactivityWeight: Double = 0.50
+    var inactivityWeight: Double {
+        UserDefaults.standard.double(forKey: UserDefaultsKey.stalenessInactivityWeight).nonZeroOr(0.50)
+    }
 
     /// Weight for memory usage in the score (0-1)
-    var memoryWeight: Double = 0.40
+    var memoryWeight: Double {
+        UserDefaults.standard.double(forKey: UserDefaultsKey.stalenessMemoryWeight).nonZeroOr(0.40)
+    }
 
     /// Weight for CPU usage in the score (0-1)
-    var cpuWeight: Double = 0.10
+    var cpuWeight: Double {
+        UserDefaults.standard.double(forKey: UserDefaultsKey.stalenessCPUWeight).nonZeroOr(0.10)
+    }
 
     /// Threshold above which an app is considered "stale" (0-1)
-    var staleThreshold: Double = 0.6
+    var staleThreshold: Double {
+        UserDefaults.standard.double(forKey: UserDefaultsKey.stalenessThreshold).nonZeroOr(0.60)
+    }
 
     /// Maximum inactivity time to normalize against (in minutes)
-    var maxInactivityMinutes: Double = 60.0
+    var maxInactivityMinutes: Double {
+        UserDefaults.standard.double(forKey: UserDefaultsKey.maxInactivityMinutes).nonZeroOr(60.0)
+    }
 
     /// Maximum memory to normalize against (in GB)
     var maxMemoryGB: Double = 4.0
 
     // MARK: - Initialization
 
-    private init() {}
+    private init() {
+        Log.tracking.info("StalenessCalculator initialized")
+    }
 
     // MARK: - Score Calculation
 

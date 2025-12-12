@@ -14,6 +14,21 @@ struct SettingsView: View {
                     Label("General", systemImage: "gear")
                 }
 
+            TrackingSettingsTab()
+                .tabItem {
+                    Label("Tracking", systemImage: "chart.line.uptrend.xyaxis")
+                }
+
+            ScoringSettingsTab()
+                .tabItem {
+                    Label("Scoring", systemImage: "slider.horizontal.3")
+                }
+
+            ProtectedAppsTab()
+                .tabItem {
+                    Label("Protected", systemImage: "lock.shield")
+                }
+
             SubscriptionSettingsTab()
                 .tabItem {
                     Label("Subscription", systemImage: "crown")
@@ -24,7 +39,7 @@ struct SettingsView: View {
                     Label("About", systemImage: "info.circle")
                 }
         }
-        .frame(width: 480, height: 350)
+        .frame(width: 520, height: 450)
     }
 }
 
@@ -41,6 +56,9 @@ struct GeneralSettingsTab: View {
     @State
     private var notificationStatus: UNAuthorizationStatus = .notDetermined
 
+    @State
+    private var hasAccessibility = PermissionsManager.shared.hasAccessibilityAccess
+
     var body: some View {
         Form {
             Section {
@@ -48,6 +66,8 @@ struct GeneralSettingsTab: View {
             } header: {
                 Text("Startup")
             }
+
+            permissionsSection
 
             Section {
                 Toggle("Enable notifications", isOn: $notificationsEnabled)
@@ -78,7 +98,7 @@ struct GeneralSettingsTab: View {
             } header: {
                 Text("Notifications")
             } footer: {
-                Text("Notifications will appear when items are created, deleted, or duplicated.")
+                Text("Notifications will alert you when stale apps are detected.")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
@@ -98,6 +118,55 @@ struct GeneralSettingsTab: View {
         .padding()
         .task {
             await updateNotificationStatus()
+        }
+        .onAppear {
+            hasAccessibility = PermissionsManager.shared.hasAccessibilityAccess
+        }
+    }
+
+    // MARK: - Permissions Section
+
+    private var permissionsSection: some View {
+        Section {
+            HStack {
+                Label {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Accessibility Access")
+                            .font(.subheadline)
+                        Text("Required for accurate window counting")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                } icon: {
+                    Image(systemName: hasAccessibility ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                        .foregroundStyle(hasAccessibility ? .green : .orange)
+                }
+
+                Spacer()
+
+                if hasAccessibility {
+                    Text("Granted")
+                        .font(.caption)
+                        .foregroundStyle(.green)
+                } else {
+                    Button("Grant Access") {
+                        PermissionsManager.shared.requestAccessibilityAccess()
+                        // Refresh status after a delay
+                        Task {
+                            try? await Task.sleep(for: .seconds(1))
+                            hasAccessibility = PermissionsManager.shared.hasAccessibilityAccess
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
+            }
+        } header: {
+            Text("Permissions")
+        } footer: {
+            Text("Window Cleaner works without accessibility access, but window count will be unavailable.")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
         }
     }
 

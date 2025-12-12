@@ -133,40 +133,41 @@ extension WelcomePageData {
     /// The default onboarding pages shown on first app launch.
     ///
     /// This array defines the standard welcome flow for WindowCleaner, including:
-    /// 1. **Welcome**: Introduction to the template
-    /// 2. **SwiftData**: Highlights the persistence layer
-    /// 3. **Keyboard Shortcuts**: Emphasizes keyboard-first navigation
-    /// 4. **Customization**: Encourages users to extend the template
-    ///
-    /// ## Customization
-    /// Replace these pages with your own content:
-    /// ```swift
-    /// WelcomeView(pages: myCustomPages)
-    /// ```
+    /// 1. **Welcome**: Introduction to the app
+    /// 2. **Tracking**: Explains app monitoring
+    /// 3. **Smart Detection**: Staleness scoring
+    /// 4. **Insights**: Usage analytics
+    /// 5. **Get Started**: Permissions and setup
     static let defaultPages: [WelcomePageData] = [
         WelcomePageData(
-            icon: "macwindow",
+            icon: "macwindow.badge.plus",
             iconColor: .appPrimary,
-            title: "Welcome to WindowCleaner",
-            description: "A modern foundation for building macOS apps with SwiftUI and SwiftData."
+            title: "Welcome to Window Cleaner",
+            description: "Keep your Mac running smoothly by identifying and closing stale, resource-heavy apps."
         ),
         WelcomePageData(
-            icon: "square.stack.3d.up.fill",
-            iconColor: .purple,
-            title: "SwiftData Powered",
-            description: "Your data is persisted and synced using Apple's latest persistence framework."
+            icon: "eye",
+            iconColor: .blue,
+            title: "Track Running Apps",
+            description: "Window Cleaner monitors all running apps, tracking memory usage, CPU activity, and how long each app has been idle."
         ),
         WelcomePageData(
-            icon: "keyboard",
+            icon: "sparkles",
             iconColor: .orange,
-            title: "Keyboard First",
-            description: "Navigate efficiently with keyboard shortcuts. Press ⌘N to create, Delete to remove."
+            title: "Smart Staleness Detection",
+            description: "Our intelligent scoring algorithm identifies apps that are using resources but haven't been active, suggesting them for cleanup."
         ),
         WelcomePageData(
-            icon: "paintbrush.fill",
-            iconColor: .pink,
-            title: "Ready to Customize",
-            description: "Built with best practices in mind. Extend the template to create your perfect app."
+            icon: "chart.bar.xaxis",
+            iconColor: .purple,
+            title: "Usage Insights",
+            description: "View detailed analytics about your app usage patterns, memory trends, and discover which apps consume the most resources."
+        ),
+        WelcomePageData(
+            icon: "checkmark.circle.fill",
+            iconColor: .green,
+            title: "Ready to Get Started",
+            description: "Window Cleaner is ready to help you manage your apps. Access it from the menu bar or the main window anytime."
         ),
     ]
 }

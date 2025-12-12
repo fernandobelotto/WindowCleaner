@@ -16,14 +16,10 @@ final class ProcessMonitor {
 
     // MARK: - Configuration
 
-    /// Polling interval in seconds
-    var pollingInterval: TimeInterval = 5.0 {
-        didSet {
-            if isMonitoring {
-                stopMonitoring()
-                startMonitoring()
-            }
-        }
+    /// Polling interval in seconds (reads from UserDefaults)
+    var pollingInterval: TimeInterval {
+        let stored = UserDefaults.standard.double(forKey: UserDefaultsKey.pollingInterval)
+        return stored > 0 ? stored : 5.0
     }
 
     // MARK: - State
