@@ -42,8 +42,8 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild build \
-            -project MacAppTemplate.xcodeproj \
-            -scheme MacAppTemplate \
+            -project WindowCleaner.xcodeproj \
+            -scheme WindowCleaner \
             -destination "platform=macOS" \
             -configuration Debug \
             -skipPackagePluginValidation \
@@ -55,8 +55,8 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild test \
-            -project MacAppTemplate.xcodeproj \
-            -scheme MacAppTemplate \
+            -project WindowCleaner.xcodeproj \
+            -scheme WindowCleaner \
             -destination "platform=macOS" \
             -configuration Debug \
             -skipPackagePluginValidation \

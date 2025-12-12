@@ -64,7 +64,7 @@ struct GeneralSettingsView: View {
 ### Register in App
 ```swift
 @main
-struct MacAppTemplateApp: App {
+struct WindowCleanerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -81,7 +81,7 @@ struct MacAppTemplateApp: App {
 ## Instructions
 
 1. **Create Settings Views**
-   - Location: `MacAppTemplate/Views/Settings/`
+   - Location: `WindowCleaner/Views/Settings/`
    - Create `SettingsView.swift` as the main container
    - Create separate views for each tab
 

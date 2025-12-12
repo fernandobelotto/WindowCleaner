@@ -10,7 +10,7 @@ Specify what code you want to test (file, function, feature).
 ### Basic Test
 ```swift
 import Testing
-@testable import MacAppTemplate
+@testable import WindowCleaner
 
 struct ItemTests {
     @Test func itemInitialization() {
@@ -68,7 +68,7 @@ struct ServiceTests {
 ```swift
 import Testing
 import SwiftData
-@testable import MacAppTemplate
+@testable import WindowCleaner
 
 struct ItemModelTests {
     @Test func itemCRUD() throws {
@@ -109,7 +109,7 @@ struct ItemModelTests {
    - Identify edge cases and error conditions
 
 2. **Create Test File**
-   - Location: `MacAppTemplateTests/`
+   - Location: `WindowCleanerTests/`
    - Name: `[ClassName]Tests.swift`
 
 3. **Write Tests**

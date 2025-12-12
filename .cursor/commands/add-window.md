@@ -9,9 +9,9 @@ Describe the window you need (purpose, size, behavior).
 
 ### Utility Window (Fixed Size)
 ```swift
-// In MacAppTemplateApp.swift
+// In WindowCleanerApp.swift
 @main
-struct MacAppTemplateApp: App {
+struct WindowCleanerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -110,7 +110,7 @@ Window("Utility", id: "utility") {
    ```
 
 3. **Create the View**
-   - Location: `MacAppTemplate/Views/Screens/`
+   - Location: `WindowCleaner/Views/Screens/`
    - Design for the window's purpose
 
 4. **Add Open/Close Triggers**

@@ -136,7 +136,7 @@ do {
 
 ### Check Model Registration
 ```swift
-// In MacAppTemplateApp.swift
+// In WindowCleanerApp.swift
 let schema = Schema([
     Item.self,
     // All models must be listed here

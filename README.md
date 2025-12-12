@@ -1,4 +1,4 @@
-# MacAppTemplate
+# WindowCleaner
 
 A modern macOS application template built with **SwiftUI**, **SwiftData**, and **Swift 6** concurrency.
 
@@ -29,13 +29,13 @@ A modern macOS application template built with **SwiftUI**, **SwiftData**, and *
 
 1. **Clone this repository**
    ```bash
-   git clone https://github.com/yourusername/MacAppTemplate.git
-   cd MacAppTemplate
+   git clone https://github.com/yourusername/WindowCleaner.git
+   cd WindowCleaner
    ```
 
 2. **Open the project**
    ```bash
-   open MacAppTemplate.xcodeproj
+   open WindowCleaner.xcodeproj
    ```
 
 3. **Build and run**
@@ -44,9 +44,9 @@ A modern macOS application template built with **SwiftUI**, **SwiftData**, and *
 ## Project Structure
 
 ```
-MacAppTemplate/
+WindowCleaner/
 ├── App/
-│   └── MacAppTemplateApp.swift    # App entry point, scene configuration
+│   └── WindowCleanerApp.swift    # App entry point, scene configuration
 ├── Models/
 │   └── Item.swift                 # SwiftData models
 ├── Views/
@@ -103,7 +103,7 @@ swiftlint --fix  # Auto-fix correctable issues
 make test
 
 # Or using xcodebuild
-xcodebuild test -project MacAppTemplate.xcodeproj -scheme MacAppTemplate -destination "platform=macOS"
+xcodebuild test -project WindowCleaner.xcodeproj -scheme WindowCleaner -destination "platform=macOS"
 ```
 
 ### Building
@@ -173,7 +173,7 @@ All public types, methods, and properties are documented with DocC-style comment
 | Shortcut | Action |
 |----------|--------|
 | — | Show Welcome |
-| — | MacAppTemplate Documentation |
+| — | WindowCleaner Documentation |
 | — | Report an Issue |
 
 > **Note**: Standard macOS shortcuts (`⌘Z`, `⌘C`, `⌘V`, etc.) are provided automatically by the system.
@@ -185,7 +185,7 @@ All public types, methods, and properties are documented with DocC-style comment
 The app uses App Sandbox with the following capabilities:
 - User-selected file read/write access
 
-Modify `MacAppTemplate.entitlements` to add capabilities like:
+Modify `WindowCleaner.entitlements` to add capabilities like:
 - Network access
 - Camera/microphone
 - Location services
@@ -209,9 +209,9 @@ Use the included renaming script to quickly rebrand the template for your new ap
 ```
 
 The script will:
-- ✅ Rename all directories (`MacAppTemplate/` → `MyNewApp/`)
-- ✅ Rename all files (`MacAppTemplateApp.swift` → `MyNewAppApp.swift`)
-- ✅ Update bundle identifiers (`com.fernandobelotto.MacAppTemplate` → `com.mycompany.MyNewApp`)
+- ✅ Rename all directories (`WindowCleaner/` → `MyNewApp/`)
+- ✅ Rename all files (`WindowCleanerApp.swift` → `MyNewAppApp.swift`)
+- ✅ Update bundle identifiers (`com.fernandobelotto.WindowCleaner` → `com.mycompany.MyNewApp`)
 - ✅ Update all code references
 - ✅ Clean Xcode DerivedData and caches
 
@@ -224,7 +224,7 @@ After running the script:
 
 1. Create a new file in `Models/`
 2. Define your `@Model` class
-3. Add to the schema in `MacAppTemplateApp.swift`
+3. Add to the schema in `WindowCleanerApp.swift`
 4. See [.cursor/rules/swiftdata-models.mdc](.cursor/rules/swiftdata-models.mdc) for patterns
 
 ### Adding New Views

@@ -5,15 +5,15 @@ Run all unit tests and UI tests, then fix any failures.
 ## Context
 - Unit Tests: Swift Testing framework (@Test macro)
 - UI Tests: XCUITest
-- Project: `MacAppTemplate.xcodeproj`
-- Scheme: `MacAppTemplate`
+- Project: `WindowCleaner.xcodeproj`
+- Scheme: `WindowCleaner`
 
 ## Instructions
 
 1. **Run Unit Tests**
    - Use `test_macos` tool with:
-     - `projectPath`: `MacAppTemplate.xcodeproj`
-     - `scheme`: `MacAppTemplate`
+     - `projectPath`: `WindowCleaner.xcodeproj`
+     - `scheme`: `WindowCleaner`
 
 2. **Analyze Results**
    - Check for failed tests
@@ -36,8 +36,8 @@ Run all unit tests and UI tests, then fix any failures.
    ```
 
 ## Test Categories
-- **Unit Tests**: `MacAppTemplateTests/` - Test models, view models, business logic
-- **UI Tests**: `MacAppTemplateUITests/` - Test user interactions, navigation
+- **Unit Tests**: `WindowCleanerTests/` - Test models, view models, business logic
+- **UI Tests**: `WindowCleanerUITests/` - Test user interactions, navigation
 
 ## SwiftData Testing Tips
 - Use in-memory ModelContainer for tests: `ModelContainer(for: Item.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))`

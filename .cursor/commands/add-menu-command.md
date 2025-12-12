@@ -8,9 +8,9 @@ Describe the menu command (name, action, keyboard shortcut, menu location).
 ## Template
 
 ```swift
-// In MacAppTemplateApp.swift
+// In WindowCleanerApp.swift
 @main
-struct MacAppTemplateApp: App {
+struct WindowCleanerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

@@ -1,6 +1,6 @@
-# MacAppTemplate — Roadmap to Best-of-the-Best
+# WindowCleaner — Roadmap to Best-of-the-Best
 
-This document tracks all planned upgrades to transform MacAppTemplate into a production-ready, reusable macOS app foundation.
+This document tracks all planned upgrades to transform WindowCleaner into a production-ready, reusable macOS app foundation.
 
 **Legend:**
 - ✅ Done
@@ -67,10 +67,10 @@ This document tracks all planned upgrades to transform MacAppTemplate into a pro
 
 | Status | Feature | Description | Notes |
 |:------:|:--------|:------------|:------|
-| ⏳ | **Unit Tests** | Sample tests for models and services | `MacAppTemplateTests/` |
-| ⏳ | **UI Tests** | Sample tests for critical user flows | `MacAppTemplateUITests/` |
+| ⏳ | **Unit Tests** | Sample tests for models and services | `WindowCleanerTests/` |
+| ⏳ | **UI Tests** | Sample tests for critical user flows | `WindowCleanerUITests/` |
 | ⏳ | **Preview Containers** | Rich preview data for all views | `ModelContainer.previewWithData` |
-| ⏳ | **Test Utilities** | Mocks, fixtures, and test helpers | `MacAppTemplateTests/Utilities/` |
+| ⏳ | **Test Utilities** | Mocks, fixtures, and test helpers | `WindowCleanerTests/Utilities/` |
 
 ---
 

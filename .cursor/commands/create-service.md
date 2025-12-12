@@ -125,7 +125,7 @@ struct DataProcessor {
    - Use `nonisolated` for CPU-intensive work
 
 2. **Create the File**
-   - Location: `MacAppTemplate/Services/[ServiceName].swift`
+   - Location: `WindowCleaner/Services/[ServiceName].swift`
 
 3. **Add Logging**
    - Use `os.Logger` for debugging

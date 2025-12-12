@@ -12,8 +12,8 @@
 	"argv": [
 		"/opt/homebrew/bin/xcode-build-server"
 	],
-	"workspace": "/Users/fernandobosco/Projects/MacAppTemplate/MacAppTemplate.xcodeproj/project.xcworkspace",
-	"build_root": "/Users/fernandobosco/Library/Developer/Xcode/DerivedData/MacAppTemplate-fhsgnjztmthdybbkfyqjgxpvsmum",
-	"scheme": "MacAppTemplate",
+	"workspace": "/Users/fernandobosco/Projects/WindowCleaner/WindowCleaner.xcodeproj/project.xcworkspace",
+	"build_root": "/Users/fernandobosco/Library/Developer/Xcode/DerivedData/WindowCleaner-fhsgnjztmthdybbkfyqjgxpvsmum",
+	"scheme": "WindowCleaner",
 	"kind": "xcode"
 }

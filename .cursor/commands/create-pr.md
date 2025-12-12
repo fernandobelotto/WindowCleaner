@@ -97,7 +97,7 @@ feat(models): add Project model with Task relationship
 - Created Project @Model with name, description, dates
 - Added one-to-many relationship with Task
 - Included cascade delete rule
-- Added to schema in MacAppTemplateApp
+- Added to schema in WindowCleanerApp
 
 Closes #123
 ```

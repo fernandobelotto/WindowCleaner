@@ -3,8 +3,8 @@
 Build and launch the macOS app in the simulator or directly on the Mac.
 
 ## Context
-- Project: `MacAppTemplate.xcodeproj`
-- Scheme: `MacAppTemplate`
+- Project: `WindowCleaner.xcodeproj`
+- Scheme: `WindowCleaner`
 - Target: macOS 15.6+
 - Swift 6 with @MainActor default isolation
 
@@ -12,8 +12,8 @@ Build and launch the macOS app in the simulator or directly on the Mac.
 
 1. Use XcodeBuildMCP to build the project:
    - Use `build_run_macos` tool with:
-     - `projectPath`: `MacAppTemplate.xcodeproj`
-     - `scheme`: `MacAppTemplate`
+     - `projectPath`: `WindowCleaner.xcodeproj`
+     - `scheme`: `WindowCleaner`
      - `configuration`: `Debug` (default)
 
 2. If there are build errors:

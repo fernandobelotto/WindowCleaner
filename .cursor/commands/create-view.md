@@ -79,9 +79,9 @@ struct DetailView: View {
    - Settings → Use `@AppStorage`
 
 2. **Create the File**
-   - Location: `MacAppTemplate/Views/[ViewName].swift`
-   - Or: `MacAppTemplate/Views/Components/` for reusable components
-   - Or: `MacAppTemplate/Views/Screens/` for full-screen views
+   - Location: `WindowCleaner/Views/[ViewName].swift`
+   - Or: `WindowCleaner/Views/Components/` for reusable components
+   - Or: `WindowCleaner/Views/Screens/` for full-screen views
 
 3. **Add Preview**
    - Include `#Preview` with mock data

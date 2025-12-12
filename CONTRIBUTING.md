@@ -1,6 +1,6 @@
-# Contributing to MacAppTemplate
+# Contributing to WindowCleaner
 
-First off, thank you for considering contributing to MacAppTemplate! 🎉
+First off, thank you for considering contributing to WindowCleaner! 🎉
 
 This document provides guidelines and steps for contributing. Following these guidelines helps communicate that you respect the time of the developers managing and developing this open source project.
 
@@ -42,8 +42,8 @@ This project and everyone participating in it is governed by our commitment to p
 
 2. **Clone your fork**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/MacAppTemplate.git
-   cd MacAppTemplate
+   git clone https://github.com/YOUR_USERNAME/WindowCleaner.git
+   cd WindowCleaner
    ```
 
 3. **Run the setup script**
@@ -56,7 +56,7 @@ This project and everyone participating in it is governed by our commitment to p
    ```bash
    make open
    # or
-   open MacAppTemplate.xcodeproj
+   open WindowCleaner.xcodeproj
    ```
 
 5. **Build and run** to verify everything works (`⌘R`)
@@ -342,8 +342,8 @@ Include:
 
 If you have questions, feel free to:
 
-- Open a [GitHub Issue](https://github.com/fernandobelotto/MacAppTemplate/issues)
-- Start a [Discussion](https://github.com/fernandobelotto/MacAppTemplate/discussions)
+- Open a [GitHub Issue](https://github.com.fernandobelotto.WindowCleaner/issues)
+- Start a [Discussion](https://github.com.fernandobelotto.WindowCleaner/discussions)
 
 Thank you for contributing! ❤️
 

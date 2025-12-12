@@ -3,8 +3,8 @@
 Delete all SwiftData files to start fresh with an empty database.
 
 ## Context
-- App Bundle ID: `com.fernandobelotto.MacAppTemplate`
-- Data Location: `~/Library/Application Support/com.fernandobelotto.MacAppTemplate/`
+- App Bundle ID: `com.fernandobelotto.WindowCleaner`
+- Data Location: `~/Library/Application Support/com.fernandobelotto.WindowCleaner/`
 - Files: `default.store`, `default.store-shm`, `default.store-wal`
 
 ## Instructions
@@ -13,12 +13,12 @@ Delete all SwiftData files to start fresh with an empty database.
 
 2. Run the following command to delete SwiftData files:
    ```bash
-   rm -rf ~/Library/Application\ Support/com.fernandobelotto.MacAppTemplate/default.store*
+   rm -rf ~/Library/Application\ Support/com.fernandobelotto.WindowCleaner/default.store*
    ```
 
 3. Alternatively, to delete **all app data** (not just SwiftData):
    ```bash
-   rm -rf ~/Library/Application\ Support/com.fernandobelotto.MacAppTemplate
+   rm -rf ~/Library/Application\ Support/com.fernandobelotto.WindowCleaner
    ```
 
 4. Rebuild and run the app to create a fresh database
@@ -36,7 +36,7 @@ Delete all SwiftData files to start fresh with an empty database.
 - UserDefaults are stored separately in `~/Library/Preferences/`
 - To also reset UserDefaults:
   ```bash
-  defaults delete com.fernandobelotto.MacAppTemplate
+  defaults delete com.fernandobelotto.WindowCleaner
   ```
 
 

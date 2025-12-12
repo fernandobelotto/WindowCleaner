@@ -27,12 +27,12 @@ Describe the feature you want to add.
 ### Phase 2: Implementation
 
 1. **Create/Update Models**
-   - Location: `MacAppTemplate/Models/`
-   - Add to schema in `MacAppTemplateApp.swift`
+   - Location: `WindowCleaner/Models/`
+   - Add to schema in `WindowCleanerApp.swift`
    - Consider migration if modifying existing models
 
 2. **Create Views**
-   - Location: `MacAppTemplate/Views/`
+   - Location: `WindowCleaner/Views/`
    - Follow existing patterns (NavigationSplitView, etc.)
    - Include previews
 
@@ -49,12 +49,12 @@ Describe the feature you want to add.
 ### Phase 3: Testing
 
 1. **Write Unit Tests**
-   - Location: `MacAppTemplateTests/`
+   - Location: `WindowCleanerTests/`
    - Test model logic
    - Test business rules
 
 2. **Write UI Tests** (if applicable)
-   - Location: `MacAppTemplateUITests/`
+   - Location: `WindowCleanerUITests/`
    - Test user workflows
 
 3. **Manual Testing**
@@ -74,7 +74,7 @@ Describe the feature you want to add.
 
 ## File Structure Template
 ```
-MacAppTemplate/
+WindowCleaner/
 ├── Models/
 │   └── NewFeatureModel.swift
 ├── Views/

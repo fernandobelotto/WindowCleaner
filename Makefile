@@ -1,4 +1,4 @@
-# MacAppTemplate Makefile
+# WindowCleaner Makefile
 # Common development tasks for the macOS app
 
 .PHONY: all format lint test test-unit test-ui test-ui-fast test-perf build clean help setup package dmg dmg-only archive clean-all docs docs-open docs-preview docs-clean
@@ -6,7 +6,7 @@
 # Build directory for distribution artifacts
 BUILD_DIR = build
 DERIVED_DATA = $(BUILD_DIR)/DerivedData
-APP_NAME = MacAppTemplate
+APP_NAME = WindowCleaner
 
 # Default target
 all: format lint build
@@ -257,7 +257,7 @@ open:
 
 # Show help
 help:
-	@echo "MacAppTemplate - Available Commands"
+	@echo "WindowCleaner - Available Commands"
 	@echo "===================================="
 	@echo ""
 	@echo "Development:"

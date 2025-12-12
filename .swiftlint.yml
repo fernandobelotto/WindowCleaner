@@ -1,5 +1,5 @@
 # =============================================================================
-# SwiftLint Configuration for MacAppTemplate
+# SwiftLint Configuration for WindowCleaner
 # =============================================================================
 # A macOS SwiftUI + SwiftData application using Swift 6 concurrency
 # Documentation: https://realm.github.io/SwiftLint/rule-directory.html
@@ -12,13 +12,13 @@
 
 # Paths to include during linting (case-sensitive)
 included:
-  - MacAppTemplate
-  - MacAppTemplateTests
-  - MacAppTemplateUITests
+  - WindowCleaner
+  - WindowCleanerTests
+  - WindowCleanerUITests
 
 # Paths to exclude during linting (takes precedence over `included`)
 excluded:
-  - MacAppTemplate.xcodeproj
+  - WindowCleaner.xcodeproj
   - .build
   - DerivedData
   - Pods

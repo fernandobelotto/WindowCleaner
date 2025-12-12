@@ -35,7 +35,7 @@ final class ModelName {
 ## Instructions
 
 1. **Create the Model File**
-   - Location: `MacAppTemplate/Models/[ModelName].swift`
+   - Location: `WindowCleaner/Models/[ModelName].swift`
    - Use `@Model` macro
    - Make class `final`
 
@@ -50,7 +50,7 @@ final class ModelName {
    - Set `inverse` for bidirectional relationships
 
 4. **Update Schema**
-   - Add model to `MacAppTemplateApp.swift` schema:
+   - Add model to `WindowCleanerApp.swift` schema:
    ```swift
    let schema = Schema([
        Item.self,
