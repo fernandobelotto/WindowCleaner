@@ -1,0 +1,323 @@
+---
+description: SwiftData model conventions and patterns
+globs:
+  - "**/Models/**/*.swift"
+  - "**/Item.swift"
+alwaysApply: false
+---
+
+# SwiftData Model Guidelines
+
+## Model Definition
+
+Use `@Model` macro for SwiftData models:
+
+```swift
+import Foundation
+import SwiftData
+
+@Model
+final class Item {
+    // MARK: - Persisted Properties
+    var title: String
+    var timestamp: Date
+    var isCompleted: Bool
+    
+    // MARK: - Relationships
+    @Relationship(deleteRule: .cascade)
+    var children: [ChildItem]?
+    
+    @Relationship(inverse: \Category.items)
+    var category: Category?
+    
+    // MARK: - Transient Properties (not persisted)
+    @Transient
+    var isSelected: Bool = false
+    
+    // MARK: - Computed Properties
+    var formattedDate: String {
+        timestamp.formatted(date: .abbreviated, time: .shortened)
+    }
+    
+    // MARK: - Initialization
+    init(title: String, timestamp: Date = Date(), isCompleted: Bool = false) {
+        self.title = title
+        self.timestamp = timestamp
+        self.isCompleted = isCompleted
+    }
+}
+```
+
+## Model Best Practices
+
+### Use Appropriate Types
+
+```swift
+@Model
+final class Document {
+    // ✅ Use native Swift types
+    var title: String
+    var createdAt: Date
+    var tags: [String]           // Arrays are supported
+    var metadata: [String: String] // Dictionaries are supported
+    
+    // ✅ Use optionals for nullable fields
+    var dueDate: Date?
+    var notes: String?
+    
+    // ✅ Use enums with Codable
+    var status: Status
+    
+    enum Status: String, Codable {
+        case draft, inProgress, completed, archived
+    }
+}
+```
+
+### Relationships
+
+```swift
+@Model
+final class Project {
+    var name: String
+    
+    // One-to-many with cascade delete
+    @Relationship(deleteRule: .cascade)
+    var tasks: [Task]?
+    
+    // One-to-one
+    @Relationship
+    var owner: User?
+}
+
+@Model
+final class Task {
+    var title: String
+    
+    // Inverse relationship
+    @Relationship(inverse: \Project.tasks)
+    var project: Project?
+}
+```
+
+### Unique Constraints
+
+```swift
+@Model
+final class User {
+    #Unique<User>([\.email])
+    
+    var email: String
+    var name: String
+}
+```
+
+### Indexing for Performance
+
+```swift
+@Model
+final class LogEntry {
+    #Index<LogEntry>([\.timestamp], [\.category])
+    
+    var timestamp: Date
+    var category: String
+    var message: String
+}
+```
+
+## ModelContainer Configuration
+
+### App Entry Point Setup
+
+```swift
+@main
+struct MacAppTemplateApp: App {
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([
+            Item.self,
+            Category.self,
+            // Add all models here
+        ])
+        
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            allowsSave: true
+        )
+        
+        do {
+            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+        } catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
+    }()
+    
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+        .modelContainer(sharedModelContainer)
+    }
+}
+```
+
+### Testing Configuration
+
+```swift
+// In-memory container for tests and previews
+static var previewContainer: ModelContainer {
+    let schema = Schema([Item.self])
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    return try! ModelContainer(for: schema, configurations: [config])
+}
+```
+
+## Querying Data
+
+### Basic Query
+
+```swift
+struct ItemListView: View {
+    @Query private var items: [Item]
+    
+    var body: some View {
+        List(items) { item in
+            ItemRow(item: item)
+        }
+    }
+}
+```
+
+### Filtered & Sorted Queries
+
+```swift
+struct TaskListView: View {
+    // Filter and sort
+    @Query(
+        filter: #Predicate<Task> { !$0.isCompleted },
+        sort: [SortDescriptor(\.dueDate, order: .forward)]
+    )
+    private var pendingTasks: [Task]
+    
+    // With animation
+    @Query(sort: \Item.timestamp, order: .reverse, animation: .default)
+    private var recentItems: [Item]
+}
+```
+
+### Dynamic Queries
+
+```swift
+struct SearchableListView: View {
+    @State private var searchText = ""
+    
+    var body: some View {
+        ItemList(searchText: searchText)
+            .searchable(text: $searchText)
+    }
+}
+
+struct ItemList: View {
+    @Query private var items: [Item]
+    
+    init(searchText: String) {
+        let predicate = #Predicate<Item> { item in
+            searchText.isEmpty || item.title.localizedStandardContains(searchText)
+        }
+        _items = Query(filter: predicate, sort: \.timestamp)
+    }
+    
+    var body: some View {
+        List(items) { item in
+            Text(item.title)
+        }
+    }
+}
+```
+
+## CRUD Operations
+
+### Create
+
+```swift
+func addItem() {
+    let newItem = Item(title: "New Item")
+    modelContext.insert(newItem)
+    // SwiftData auto-saves, but you can force save:
+    // try? modelContext.save()
+}
+```
+
+### Update
+
+```swift
+func updateItem(_ item: Item, title: String) {
+    item.title = title
+    // Changes are tracked automatically
+}
+```
+
+### Delete
+
+```swift
+func deleteItem(_ item: Item) {
+    modelContext.delete(item)
+}
+
+func deleteItems(at offsets: IndexSet) {
+    withAnimation {
+        for index in offsets {
+            modelContext.delete(items[index])
+        }
+    }
+}
+```
+
+## Migration
+
+For schema changes, define migration plans:
+
+```swift
+enum ItemSchemaV1: VersionedSchema {
+    static var versionIdentifier: Schema.Version = .init(1, 0, 0)
+    static var models: [any PersistentModel.Type] { [Item.self] }
+    
+    @Model
+    final class Item {
+        var title: String
+        var timestamp: Date
+    }
+}
+
+enum ItemSchemaV2: VersionedSchema {
+    static var versionIdentifier: Schema.Version = .init(2, 0, 0)
+    static var models: [any PersistentModel.Type] { [Item.self] }
+    
+    @Model
+    final class Item {
+        var title: String
+        var timestamp: Date
+        var priority: Int  // New field
+    }
+}
+
+enum ItemMigrationPlan: SchemaMigrationPlan {
+    static var schemas: [any VersionedSchema.Type] {
+        [ItemSchemaV1.self, ItemSchemaV2.self]
+    }
+    
+    static var stages: [MigrationStage] {
+        [migrateV1toV2]
+    }
+    
+    static let migrateV1toV2 = MigrationStage.lightweight(
+        fromVersion: ItemSchemaV1.self,
+        toVersion: ItemSchemaV2.self
+    )
+}
+```
+
+## References
+
+- @Item.swift — Example model
+- @MacAppTemplateApp.swift — ModelContainer configuration

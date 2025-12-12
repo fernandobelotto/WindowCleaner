@@ -1,0 +1,171 @@
+---
+description: SwiftLint configuration and usage for code quality enforcement
+globs: **/*.swift
+alwaysApply: false
+---
+# SwiftLint — Code Quality & Style Enforcement
+
+This project uses [SwiftLint](https://github.com/realm/SwiftLint) to enforce Swift style and conventions, integrated as an Xcode Build Tool Plugin.
+
+## Installation
+
+SwiftLint is installed as an **Xcode Package Dependency** using the SwiftLintPlugins package:
+
+1. In Xcode: **File → Add Package Dependencies...**
+2. Enter URL: `https://github.com/SimplyDanny/SwiftLintPlugins`
+3. Add `SwiftLintBuildToolPlugin` to the target's **Build Phases → Run Build Tool Plug-ins**
+
+The plugin runs automatically on every build (⌘B).
+
+## Configuration
+
+The project uses `.swiftlint.yml` in the root directory. Key configurations:
+
+### Included Paths
+- `MacAppTemplate/` — Main app source
+- `MacAppTemplateTests/` — Unit tests
+- `MacAppTemplateUITests/` — UI tests
+
+### Disabled Rules (SwiftUI Compatibility)
+- `trailing_comma` — SwiftUI arrays commonly use trailing commas
+- `multiple_closures_with_trailing_closure` — SwiftUI view builders use multiple trailing closures
+
+### Enabled Opt-In Rules
+
+**Code Quality:**
+- `empty_count` — Prefer `isEmpty` over `count == 0`
+- `empty_string` — Prefer `isEmpty` over `== ""`
+- `first_where` — Prefer `.first(where:)` over `.filter().first`
+- `force_unwrapping` — Warn on force unwrapping (`!`)
+
+**Style:**
+- `sorted_imports` — Keep imports alphabetically sorted
+- `modifier_order` — Consistent modifier ordering
+- `closure_spacing` — Proper spacing in closures
+
+**Safety:**
+- `implicitly_unwrapped_optional` — Warn on `Type!` declarations
+- `discouraged_optional_boolean` — Avoid `Bool?`
+- `fatal_error_message` — Require message in `fatalError()`
+
+## Usage
+
+### Automatic Linting
+SwiftLint runs automatically when you build (⌘B). Violations appear as Xcode warnings/errors.
+
+### Command Line (Optional)
+
+If SwiftLint is installed via Homebrew (`brew install swiftlint`):
+
+```bash
+# Lint all files
+cd /Users/fernandobosco/Projects/MacAppTemplate
+swiftlint
+
+# Auto-fix correctable violations
+swiftlint --fix
+
+# List all rules
+swiftlint rules
+
+# Lint specific file
+swiftlint lint --path MacAppTemplate/ContentView.swift
+```
+
+## Disabling Rules in Code
+
+### Disable for a block:
+```swift
+// swiftlint:disable force_cast
+let value = someObject as! String
+// swiftlint:enable force_cast
+```
+
+### Disable for next line:
+```swift
+// swiftlint:disable:next force_unwrapping
+let name = optionalName!
+```
+
+### Disable for current line:
+```swift
+let id = optionalId! // swiftlint:disable:this force_unwrapping
+```
+
+### Disable all rules temporarily:
+```swift
+// swiftlint:disable all
+// ... code exempt from linting ...
+// swiftlint:enable all
+```
+
+## Custom Rules
+
+The project includes custom regex-based rules:
+
+| Rule | Severity | Description |
+|------|----------|-------------|
+| `no_print_statements` | Warning | Use `os.Logger` instead of `print()` |
+| `no_nslog` | Warning | Use `os.Logger` instead of `NSLog()` |
+| `todo_fixme` | Warning | Flags TODO/FIXME comments |
+
+## Naming Conventions
+
+Identifier names must follow these rules:
+- **Minimum length**: 2 characters (warning), 1 (error)
+- **Maximum length**: 50 characters (warning), 60 (error)
+- **Excluded short names**: `id`, `x`, `y`, `i`, `j`, `to`, `on`, `at`, `by`, `URL`, `url`
+
+## Line Length
+
+- **Warning**: 120 characters
+- **Error**: 200 characters
+- Ignores: comments, URLs, function declarations, interpolated strings
+
+## When Writing Swift Code
+
+1. **Build regularly** (⌘B) to catch violations early
+2. **Fix warnings before committing** — keep the codebase clean
+3. **Use `// swiftlint:disable`** sparingly and with good reason
+4. **Prefer `os.Logger`** over `print()` for logging
+5. **Avoid force unwrapping** — use `guard let`, `if let`, or `??` instead
+
+## Analyzer Rules (Optional)
+
+For deeper analysis, run with the `analyze` command after a clean build:
+
+```bash
+# Requires clean build log
+xcodebuild -workspace MacAppTemplate.xcworkspace -scheme MacAppTemplate clean build > xcodebuild.log
+swiftlint analyze --compiler-log-path xcodebuild.log
+```
+
+Analyzer rules include:
+- `unused_import` — Find unused imports
+- `unused_declaration` — Find unused code
+- `explicit_self` — Prefer explicit `self` in closures
+
+## Troubleshooting
+
+### "Trust & Enable" Dialog
+When first using the plugin, Xcode will ask to trust it. Click **Trust & Enable**.
+
+### Plugin Not Running
+1. Verify plugin is in **Build Phases → Run Build Tool Plug-ins**
+2. Clean build folder (⌘⇧K) and rebuild
+3. Check `.swiftlint.yml` syntax is valid
+
+### Too Many Warnings
+Consider using a baseline to ignore existing violations:
+```yaml
+# In .swiftlint.yml
+baseline: Baseline.json
+write_baseline: Baseline.json
+```
+
+## References
+
+- [SwiftLint GitHub](https://github.com/realm/SwiftLint)
+- [Rule Directory](https://realm.github.io/SwiftLint/rule-directory.html)
+- [SwiftLintPlugins](https://github.com/SimplyDanny/SwiftLintPlugins)
+- @.swiftlint.yml — Project configuration file

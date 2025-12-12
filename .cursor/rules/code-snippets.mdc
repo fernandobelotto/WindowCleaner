@@ -1,0 +1,413 @@
+---
+description: Common code snippets and templates for rapid development
+globs:
+alwaysApply: false
+---
+
+# Code Snippets & Templates
+
+Use these templates when creating new files or components.
+
+## New SwiftData Model
+
+```swift
+import Foundation
+import SwiftData
+
+@Model
+final class NewModel {
+    // MARK: - Properties
+    var id: UUID
+    var name: String
+    var createdAt: Date
+    var updatedAt: Date
+    
+    // MARK: - Relationships
+    @Relationship(deleteRule: .cascade)
+    var children: [ChildModel]?
+    
+    // MARK: - Computed Properties
+    var displayName: String {
+        name.isEmpty ? "Untitled" : name
+    }
+    
+    // MARK: - Initialization
+    init(name: String = "") {
+        self.id = UUID()
+        self.name = name
+        self.createdAt = Date()
+        self.updatedAt = Date()
+    }
+    
+    // MARK: - Methods
+    func touch() {
+        updatedAt = Date()
+    }
+}
+```
+
+## New SwiftUI View
+
+```swift
+import SwiftUI
+import SwiftData
+
+struct NewView: View {
+    // MARK: - Environment
+    @Environment(\.modelContext) private var modelContext
+    
+    // MARK: - State
+    @State private var searchText = ""
+    
+    // MARK: - Properties
+    let title: String
+    
+    // MARK: - Body
+    var body: some View {
+        content
+            .navigationTitle(title)
+            .searchable(text: $searchText)
+            .toolbar { toolbarContent }
+    }
+    
+    // MARK: - Views
+    @ViewBuilder
+    private var content: some View {
+        Text("Content goes here")
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Button("Action", systemImage: "plus") {
+                // Action
+            }
+        }
+    }
+}
+
+// MARK: - Preview
+#Preview {
+    NewView(title: "Title")
+        .modelContainer(for: Item.self, inMemory: true)
+}
+```
+
+## List View with SwiftData Query
+
+```swift
+import SwiftUI
+import SwiftData
+
+struct ItemListView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \Item.timestamp, order: .reverse) private var items: [Item]
+    
+    var body: some View {
+        List {
+            ForEach(items) { item in
+                ItemRow(item: item)
+            }
+            .onDelete(perform: deleteItems)
+        }
+        .overlay {
+            if items.isEmpty {
+                ContentUnavailableView(
+                    "No Items",
+                    systemImage: "tray",
+                    description: Text("Add an item to get started.")
+                )
+            }
+        }
+    }
+    
+    private func deleteItems(at offsets: IndexSet) {
+        withAnimation {
+            for index in offsets {
+                modelContext.delete(items[index])
+            }
+        }
+    }
+}
+```
+
+## Detail View
+
+```swift
+import SwiftUI
+import SwiftData
+
+struct ItemDetailView: View {
+    @Bindable var item: Item
+    
+    var body: some View {
+        Form {
+            Section("Details") {
+                TextField("Title", text: $item.title)
+                DatePicker("Date", selection: $item.timestamp)
+            }
+            
+            Section("Info") {
+                LabeledContent("Created") {
+                    Text(item.createdAt, style: .date)
+                }
+            }
+        }
+        .formStyle(.grouped)
+        .navigationTitle(item.title)
+    }
+}
+```
+
+## Sheet / Modal View
+
+```swift
+import SwiftUI
+import SwiftData
+
+struct NewItemSheet: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var title = ""
+    
+    var body: some View {
+        NavigationStack {
+            Form {
+                TextField("Title", text: $title)
+            }
+            .navigationTitle("New Item")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Add") {
+                        addItem()
+                    }
+                    .disabled(title.isEmpty)
+                }
+            }
+        }
+        .frame(minWidth: 300, minHeight: 200)
+    }
+    
+    private func addItem() {
+        let item = Item(title: title)
+        modelContext.insert(item)
+        dismiss()
+    }
+}
+```
+
+## Settings View
+
+```swift
+import SwiftUI
+
+struct SettingsView: View {
+    @AppStorage("showWelcome") private var showWelcome = true
+    @AppStorage("defaultCategory") private var defaultCategory = "General"
+    
+    var body: some View {
+        TabView {
+            GeneralSettingsView(showWelcome: $showWelcome, defaultCategory: $defaultCategory)
+                .tabItem {
+                    Label("General", systemImage: "gear")
+                }
+            
+            AdvancedSettingsView()
+                .tabItem {
+                    Label("Advanced", systemImage: "gearshape.2")
+                }
+        }
+        .frame(width: 450, height: 250)
+    }
+}
+
+struct GeneralSettingsView: View {
+    @Binding var showWelcome: Bool
+    @Binding var defaultCategory: String
+    
+    var body: some View {
+        Form {
+            Toggle("Show welcome screen", isOn: $showWelcome)
+            
+            Picker("Default category", selection: $defaultCategory) {
+                Text("General").tag("General")
+                Text("Work").tag("Work")
+                Text("Personal").tag("Personal")
+            }
+        }
+        .formStyle(.grouped)
+        .padding()
+    }
+}
+```
+
+## Observable ViewModel
+
+```swift
+import SwiftUI
+import SwiftData
+import Observation
+
+@Observable
+final class ItemViewModel {
+    // MARK: - State
+    var items: [Item] = []
+    var selectedItem: Item?
+    var isLoading = false
+    var errorMessage: String?
+    
+    // MARK: - Dependencies
+    private let modelContext: ModelContext
+    
+    // MARK: - Init
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
+    }
+    
+    // MARK: - Actions
+    @MainActor
+    func loadItems() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            let descriptor = FetchDescriptor<Item>(sortBy: [SortDescriptor(\.timestamp, order: .reverse)])
+            items = try modelContext.fetch(descriptor)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func addItem(title: String) {
+        let item = Item(title: title)
+        modelContext.insert(item)
+        items.insert(item, at: 0)
+    }
+    
+    func deleteItem(_ item: Item) {
+        modelContext.delete(item)
+        items.removeAll { $0.id == item.id }
+    }
+}
+```
+
+## Unit Test
+
+```swift
+import Testing
+import SwiftData
+@testable import MacAppTemplate
+
+struct ItemTests {
+    func makeContainer() throws -> ModelContainer {
+        let schema = Schema([Item.self])
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [config])
+    }
+    
+    @Test("Item initializes with default values")
+    func initialization() {
+        let item = Item(title: "Test")
+        
+        #expect(item.title == "Test")
+        #expect(item.timestamp <= Date())
+    }
+    
+    @Test("Item persists to SwiftData")
+    func persistence() throws {
+        let container = try makeContainer()
+        let context = container.mainContext
+        
+        let item = Item(title: "Persisted Item")
+        context.insert(item)
+        try context.save()
+        
+        let descriptor = FetchDescriptor<Item>()
+        let fetched = try context.fetch(descriptor)
+        
+        #expect(fetched.count == 1)
+        #expect(fetched.first?.title == "Persisted Item")
+    }
+}
+```
+
+## UI Test
+
+```swift
+import XCTest
+
+final class ItemUITests: XCTestCase {
+    var app: XCUIApplication!
+    
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launchArguments = ["--uitesting"]
+        app.launch()
+    }
+    
+    @MainActor
+    func testAddItem() throws {
+        let addButton = app.buttons["Add Item"]
+        XCTAssertTrue(addButton.waitForExistence(timeout: 2))
+        addButton.click()
+        
+        // Verify item was added
+        let list = app.outlines.firstMatch
+        XCTAssertTrue(list.cells.count > 0)
+    }
+}
+```
+
+## Custom View Modifier
+
+```swift
+import SwiftUI
+
+struct CardStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding()
+            .background(.regularMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.1), radius: 4, y: 2)
+    }
+}
+
+extension View {
+    func cardStyle() -> some View {
+        modifier(CardStyle())
+    }
+}
+
+// Usage
+Text("Hello")
+    .cardStyle()
+```
+
+## Custom Environment Value
+
+```swift
+import SwiftUI
+
+private struct CustomValueKey: EnvironmentKey {
+    static let defaultValue: String = "default"
+}
+
+extension EnvironmentValues {
+    var customValue: String {
+        get { self[CustomValueKey.self] }
+        set { self[CustomValueKey.self] = newValue }
+    }
+}
+
+// Usage
+.environment(\.customValue, "custom")
+```

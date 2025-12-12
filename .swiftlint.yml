@@ -1,0 +1,314 @@
+# =============================================================================
+# SwiftLint Configuration for MacAppTemplate
+# =============================================================================
+# A macOS SwiftUI + SwiftData application using Swift 6 concurrency
+# Documentation: https://realm.github.io/SwiftLint/rule-directory.html
+# Run `swiftlint rules` to see all available rules
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# PATHS
+# -----------------------------------------------------------------------------
+
+# Paths to include during linting (case-sensitive)
+included:
+  - MacAppTemplate
+  - MacAppTemplateTests
+  - MacAppTemplateUITests
+
+# Paths to exclude during linting (takes precedence over `included`)
+excluded:
+  - MacAppTemplate.xcodeproj
+  - .build
+  - DerivedData
+  - Pods
+  - Carthage
+  - .swiftpm
+
+# -----------------------------------------------------------------------------
+# RULE CONFIGURATION
+# -----------------------------------------------------------------------------
+
+# Rules to disable from the default enabled set
+disabled_rules:
+  # SwiftUI commonly uses trailing commas in arrays/dictionaries
+  - trailing_comma
+  
+  # SwiftUI view builders often have multiple trailing closures
+  - multiple_closures_with_trailing_closure
+  
+  # File organization rules conflict with our preferred structure
+  - file_types_order
+  - type_contents_order
+  
+  # Opening braces on same line is common in SwiftUI
+  # - opening_brace  # Uncomment if you prefer different style
+  
+  # Large tuples are sometimes needed for SwiftUI state
+  # - large_tuple  # Uncomment if needed
+
+# Opt-in rules that are disabled by default but useful for this project
+# Find all available rules: `swiftlint rules`
+opt_in_rules:
+  # Code Quality
+  - empty_count                    # Prefer isEmpty over count == 0
+  - empty_string                   # Prefer isEmpty over == ""
+  - first_where                    # Prefer .first(where:) over .filter().first
+  - last_where                     # Prefer .last(where:) over .filter().last
+  - sorted_first_last              # Prefer min()/max() over sorted().first/last
+  - contains_over_first_not_nil    # Prefer contains over first != nil
+  - contains_over_filter_count     # Prefer contains over filter().count
+  - contains_over_filter_is_empty  # Prefer contains over filter().isEmpty
+  - flatmap_over_map_reduce        # Prefer flatMap over map().reduce([], +)
+  - reduce_boolean                 # Prefer allSatisfy/contains over reduce(true/false)
+  
+  # Safety
+  - force_unwrapping               # Warn on force unwrapping (!)
+  - implicitly_unwrapped_optional  # Warn on implicitly unwrapped optionals
+  - discouraged_optional_boolean   # Avoid Bool? which can be confusing
+  - discouraged_optional_collection # Prefer empty collection over nil
+  - fallthrough                    # Explicit fallthrough can be error-prone
+  - fatal_error_message            # Require message in fatalError()
+  - yoda_condition                 # Avoid Yoda conditions (42 == value)
+  
+  # Style & Readability
+  - sorted_imports                 # Keep import statements sorted
+  - closure_spacing                # Proper spacing in closures
+  - modifier_order                 # Consistent modifier ordering
+  - operator_usage_whitespace      # Proper spacing around operators
+  - collection_alignment           # Align collection literals
+  - multiline_arguments            # Multiline function arguments on new lines
+  - multiline_parameters           # Multiline function parameters on new lines
+  - vertical_parameter_alignment_on_call  # Align parameters in function calls
+  - literal_expression_end_indentation    # Proper indentation for literals
+  
+  # Modern Swift
+  - prefer_self_in_static_references  # Use Self instead of type name in static
+  - prefer_self_type_over_type_of_self # Use Self instead of type(of: self)
+  - toggle_bool                    # Prefer .toggle() over = !
+  - joined_default_parameter       # Prefer joined() over joined(separator: "")
+  
+  # SwiftUI Specific
+  - attributes                     # Proper attribute placement
+  
+  # Documentation (optional - comment out if too strict)
+  # - missing_docs                 # Require documentation comments
+
+# Analyzer rules (run with `swiftlint analyze`)
+# These require compilation and are slower but more accurate
+analyzer_rules:
+  - unused_import                  # Find unused imports
+  - unused_declaration             # Find unused declarations
+  - explicit_self                  # Prefer explicit self in closures
+
+# -----------------------------------------------------------------------------
+# GLOBAL SETTINGS
+# -----------------------------------------------------------------------------
+
+# Don't fail if no lintable files found (useful in CI)
+allow_zero_lintable_files: false
+
+# Treat all warnings as errors (enable for strict mode)
+strict: false
+
+# Treat all errors as warnings (enable for lenient mode)
+lenient: false
+
+# Check for SwiftLint updates
+check_for_updates: false
+
+# Reporter type: xcode, json, csv, checkstyle, junit, html, emoji, markdown
+reporter: xcode
+
+# -----------------------------------------------------------------------------
+# RULE-SPECIFIC CONFIGURATIONS
+# -----------------------------------------------------------------------------
+
+# Line Length
+# SwiftUI views can have long lines due to modifiers
+line_length:
+  warning: 120
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+  ignores_function_declarations: true
+  ignores_interpolated_strings: true
+
+# Type Body Length
+# SwiftUI views can be longer due to view builders
+type_body_length:
+  warning: 300
+  error: 500
+
+# File Length
+file_length:
+  warning: 500
+  error: 1000
+  ignore_comment_only_lines: true
+
+# Function Body Length
+function_body_length:
+  warning: 50
+  error: 100
+
+# Function Parameter Count
+function_parameter_count:
+  warning: 6
+  error: 8
+
+# Cyclomatic Complexity
+cyclomatic_complexity:
+  warning: 15
+  error: 25
+
+# Nesting Level
+nesting:
+  type_level: 2
+  function_level: 3
+
+# Identifier Naming
+# Common Swift/SwiftUI patterns often use short names
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  max_length:
+    warning: 50
+    error: 60
+  excluded:
+    - id        # Common for Identifiable
+    - x         # Coordinates
+    - y         # Coordinates
+    - z         # Coordinates
+    - i         # Loop index
+    - j         # Loop index
+    - k         # Loop index
+    - to        # Range/conversion
+    - on        # Callbacks
+    - of        # Collection operations
+    - in        # Closures
+    - at        # Index access
+    - by        # Sorting/grouping
+    - lhs       # Operators
+    - rhs       # Operators
+    - URL       # URL type
+    - url       # URL variable
+  validates_start_with_lowercase:
+    severity: warning
+
+# Type Naming
+type_name:
+  min_length: 3
+  max_length:
+    warning: 50
+    error: 60
+  excluded:
+    - ID        # For Identifiable typealiases
+  validates_start_with_lowercase: false
+  allowed_symbols: ["_"]
+
+# Force Cast
+# Warn instead of error - sometimes needed for bridging
+force_cast: warning
+
+# Force Try
+force_try:
+  severity: warning
+
+# Trailing Whitespace
+trailing_whitespace:
+  ignores_empty_lines: true
+  ignores_comments: true
+
+# Vertical Whitespace
+vertical_whitespace:
+  max_empty_lines: 2
+
+# Colon Spacing
+colon:
+  flexible_right_spacing: false
+  apply_to_dictionaries: true
+
+# Comma Spacing
+comma:
+  severity: warning
+
+# Statement Position (else, catch on same line as closing brace)
+statement_position:
+  statement_mode: default
+
+# Attributes
+# @main, @Model, etc. on their own line
+attributes:
+  always_on_same_line:
+    - "@IBAction"
+    - "@IBOutlet"
+    - "@objc"
+  always_on_line_above:
+    - "@Model"
+    - "@Query"
+    - "@Environment"
+    - "@State"
+    - "@Binding"
+    - "@Published"
+    - "@Observable"
+    - "@MainActor"
+    - "@discardableResult"
+
+# Modifier Order
+# Consistent ordering of access modifiers
+modifier_order:
+  preferred_modifier_order:
+    - override
+    - acl
+    - setterACL
+    - dynamic
+    - mutators
+    - lazy
+    - final
+    - required
+    - convenience
+    - typeMethods
+    - owned
+
+# Void Return
+void_return:
+  severity: warning
+
+# Unused Closure Parameter
+unused_closure_parameter:
+  severity: warning
+
+# -----------------------------------------------------------------------------
+# CUSTOM RULES (regex-based)
+# -----------------------------------------------------------------------------
+
+custom_rules:
+  # Discourage print() in production code
+  no_print_statements:
+    name: "No Print Statements"
+    regex: "\\bprint\\s*\\("
+    match_kinds:
+      - identifier
+    message: "Use os.Logger instead of print() for production code"
+    severity: warning
+    
+  # Encourage using Logger over NSLog
+  no_nslog:
+    name: "No NSLog"
+    regex: "\\bNSLog\\s*\\("
+    match_kinds:
+      - identifier
+    message: "Use os.Logger instead of NSLog"
+    severity: warning
+
+  # Mark TODO/FIXME as warnings so they show up in Xcode
+  todo_fixme:
+    name: "TODO/FIXME"
+    regex: "(TODO|FIXME|HACK|XXX):"
+    match_kinds:
+      - comment
+    message: "Resolve TODO/FIXME before release"
+    severity: warning
+
+

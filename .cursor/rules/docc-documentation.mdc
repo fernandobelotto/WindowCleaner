@@ -1,0 +1,513 @@
+# DocC Documentation Guide
+
+This guide covers writing and generating documentation using Apple's DocC (Documentation Compiler).
+
+## Overview
+
+DocC is Apple's documentation compiler that generates rich, browsable documentation from specially formatted comments in Swift code. The documentation is viewable in Xcode's Developer Documentation window or as a static website.
+
+## Writing DocC Comments
+
+### Basic Structure
+
+Use triple-slash comments (`///`) for documentation:
+
+```swift
+/// A brief, single-line summary of what this does.
+///
+/// A more detailed description that can span multiple paragraphs.
+/// This section can include usage examples and important notes.
+///
+/// ## Section Headers
+/// Use double hash marks for section headers to organize content.
+///
+/// - Parameter name: Description of the parameter
+/// - Returns: Description of what is returned
+struct MyType {
+    // ...
+}
+```
+
+### Comment Sections
+
+#### 1. Summary (Required)
+The first paragraph is the summary shown in autocomplete and quick help:
+
+```swift
+/// Creates a new user account with the specified credentials.
+func createUser() { }
+```
+
+#### 2. Discussion (Optional)
+Additional paragraphs after the summary provide detailed information:
+
+```swift
+/// Validates user input before processing.
+///
+/// This function checks for common validation errors including:
+/// - Empty fields
+/// - Invalid email format
+/// - Password strength requirements
+func validate() { }
+```
+
+#### 3. Parameters
+
+```swift
+/// Fetches items from the server.
+///
+/// - Parameters:
+///   - limit: Maximum number of items to fetch
+///   - offset: Number of items to skip
+///   - filter: Optional filter criteria
+func fetchItems(limit: Int, offset: Int, filter: String?) { }
+
+// Or for a single parameter:
+/// - Parameter id: The unique identifier
+func getItem(id: UUID) { }
+```
+
+#### 4. Returns
+
+```swift
+/// Calculates the total price.
+///
+/// - Returns: The sum of all item prices including tax
+func calculateTotal() -> Double { }
+```
+
+#### 5. Throws
+
+```swift
+/// Saves the document to disk.
+///
+/// - Throws: `DocumentError.writeFailure` if the file cannot be written
+func saveDocument() throws { }
+```
+
+### Formatting
+
+#### Section Headers
+
+Use `##` for major sections, `###` for subsections:
+
+```swift
+/// A complex view with multiple responsibilities.
+///
+/// ## Features
+/// - Feature one
+/// - Feature two
+///
+/// ## Usage
+/// Here's how to use this view...
+///
+/// ### Advanced Usage
+/// For advanced scenarios...
+struct ComplexView: View { }
+```
+
+#### Lists
+
+Use `-` or `*` for bulleted lists, numbers for ordered lists:
+
+```swift
+/// Supported operations:
+/// - Create new items
+/// - Update existing items
+/// - Delete items
+///
+/// ## Steps
+/// 1. Validate input
+/// 2. Process data
+/// 3. Save changes
+```
+
+#### Code Blocks
+
+Use triple backticks with optional language identifier:
+
+```swift
+/// Example usage:
+///
+/// ```swift
+/// let manager = DataManager()
+/// try await manager.fetchData()
+/// ```
+```
+
+#### Emphasis
+
+- **Bold**: `**text**`
+- *Italic*: `*text*` or `_text_`
+- `Code`: `` `code` ``
+
+```swift
+/// **Important**: Always call this method on the main thread.
+///
+/// The `validate()` method *must* be called before `save()`.
+```
+
+### Cross-References
+
+Link to other symbols using double backticks:
+
+```swift
+/// Manages data persistence using ``DataService``.
+///
+/// See ``ItemDetailView`` for how this is displayed.
+///
+/// - SeeAlso: ``AppError`` for error handling
+struct DataManager {
+    /// The shared ``DataService`` instance
+    let service: DataService
+}
+```
+
+### Special Callouts
+
+Use these for important information:
+
+```swift
+/// Performs a critical operation.
+///
+/// - Note: This operation is irreversible.
+/// - Important: Always backup data before calling this.
+/// - Warning: This may take several seconds to complete.
+/// - Tip: Use ``quickSave()`` for faster operations.
+/// - Experiment: Try combining this with ``batchProcess()``.
+func criticalOperation() { }
+```
+
+### Availability
+
+Document platform or version requirements:
+
+```swift
+/// A modern persistence layer.
+///
+/// This type requires macOS 15.0 or later.
+@available(macOS 15.0, *)
+struct ModernStorage { }
+```
+
+## Examples from This Project
+
+### Documenting Views
+
+```swift
+/// Displays detailed information for a selected item.
+///
+/// This view presents item information in a grouped form layout with two sections:
+/// - **Details**: Shows creation timestamp in both absolute and relative formats
+/// - **Identifier**: Displays the unique UUID for the item (selectable for copying)
+///
+/// ## Toolbar Actions
+/// - **Edit**: Navigates to the item edit view using ``NavigationManager``
+/// - **Share**: Provides a share sheet to share the item's formatted date
+///
+/// ## Usage
+/// ```swift
+/// NavigationStack {
+///     ItemDetailView(item: myItem)
+/// }
+/// ```
+///
+/// - Note: This view uses `@Bindable` to allow two-way binding with the item.
+/// - SeeAlso: ``ItemEditView`` for the editing interface
+struct ItemDetailView: View { }
+```
+
+### Documenting Models
+
+```swift
+/// Data model representing a single page in the welcome carousel.
+///
+/// Use this model to define the content for each onboarding page shown in ``WelcomeView``.
+///
+/// ## Example
+/// ```swift
+/// let page = WelcomePageData(
+///     icon: "star.fill",
+///     iconColor: .yellow,
+///     title: "Feature Name",
+///     description: "Detailed explanation of the feature."
+/// )
+/// ```
+struct WelcomePageData: Identifiable {
+    /// Unique identifier for this page
+    let id: UUID
+
+    /// SF Symbol name for the page icon
+    let icon: String
+}
+```
+
+### Documenting Enums
+
+```swift
+/// Preset configurations for common empty state scenarios.
+///
+/// These presets provide ready-to-use configurations for frequent use cases,
+/// ensuring consistency across the application.
+///
+/// ## Available Presets
+/// - ``noItems``: Empty list state with "Add Item" suggestion
+/// - ``noSelection``: Detail view placeholder when nothing is selected
+/// - ``noSearchResults(_:)``: Search results empty state with query context
+enum Preset {
+    /// Displayed when a list contains no items.
+    /// Suggests using the + button or ⌘N keyboard shortcut.
+    case noItems
+
+    /// Displayed when a search query returns no results.
+    /// - Parameter query: The search query that returned no results
+    case noSearchResults(String)
+}
+```
+
+### Documenting Extensions
+
+```swift
+// MARK: - Item Extensions
+
+extension Item {
+    /// Returns the item's timestamp formatted for display.
+    ///
+    /// Uses abbreviated date format with shortened time.
+    ///
+    /// ## Example Output
+    /// - "Jan 15, 2024 at 3:30 PM"
+    /// - "Dec 6, 2025 at 10:15 AM"
+    var formattedDate: String {
+        timestamp.formatted(date: .abbreviated, time: .shortened)
+    }
+}
+```
+
+## Generating Documentation
+
+### Using Xcode (GUI)
+
+1. Open the project in Xcode
+2. Select **Product → Build Documentation** (⌃⌘⇧D)
+3. View in **Window → Developer Documentation**
+
+### Using Command Line (Recommended)
+
+Generate documentation from the terminal without opening Xcode:
+
+```bash
+# Build documentation
+xcodebuild docbuild \
+  -scheme MacAppTemplate \
+  -destination 'platform=macOS' \
+  -derivedDataPath ./build/DerivedData
+
+# Documentation is generated at:
+# ./build/DerivedData/Build/Products/Debug/MacAppTemplate.doccarchive
+```
+
+### Opening Generated Documentation
+
+**Option 1: Open in Xcode**
+```bash
+open ./build/DerivedData/Build/Products/Debug/MacAppTemplate.doccarchive
+```
+
+**Option 2: Preview as Website**
+```bash
+# Install docc if not already installed (requires Xcode 13.3+)
+# The docc command is included with Xcode
+
+# Preview the documentation
+xcrun docc preview \
+  ./build/DerivedData/Build/Products/Debug/MacAppTemplate.doccarchive
+```
+
+This starts a local web server (usually at `http://localhost:8080`) where you can browse the documentation in any web browser.
+
+**Option 3: Export Static Website**
+```bash
+# Convert to static HTML
+xcrun docc process-archive transform-for-static-hosting \
+  ./build/DerivedData/Build/Products/Debug/MacAppTemplate.doccarchive \
+  --output-path ./docs \
+  --hosting-base-path MacAppTemplate
+
+# Serve with any web server
+cd docs
+python3 -m http.server 8000
+# Open http://localhost:8000
+```
+
+### Makefile Integration
+
+Add to your `Makefile`:
+
+```makefile
+.PHONY: docs docs-open docs-preview docs-clean
+
+## Generate documentation
+docs:
+	xcodebuild docbuild \
+		-scheme MacAppTemplate \
+		-destination 'platform=macOS' \
+		-derivedDataPath ./build/DerivedData
+
+## Open documentation in Xcode
+docs-open: docs
+	open ./build/DerivedData/Build/Products/Debug/MacAppTemplate.doccarchive
+
+## Preview documentation in browser
+docs-preview: docs
+	@echo "Starting documentation preview server..."
+	@echo "Open http://localhost:8080 in your browser"
+	xcrun docc preview \
+		./build/DerivedData/Build/Products/Debug/MacAppTemplate.doccarchive
+
+## Clean documentation build artifacts
+docs-clean:
+	rm -rf ./build/DerivedData/Build/Products/Debug/*.doccarchive
+```
+
+Usage:
+```bash
+make docs          # Generate documentation
+make docs-open     # Generate and open in Xcode
+make docs-preview  # Generate and preview in browser
+make docs-clean    # Remove generated docs
+```
+
+## Best Practices
+
+### 1. Documentation Coverage
+
+Document these elements:
+- ✅ Public types (structs, classes, enums)
+- ✅ Public methods and properties
+- ✅ Complex internal logic (for team reference)
+- ❌ Private implementation details (optional)
+- ❌ Trivial getters/setters (unless behavior is non-obvious)
+
+### 2. Writing Style
+
+- **Start with a verb**: "Displays", "Calculates", "Manages"
+- **Be concise**: First line should be a complete sentence
+- **Add context**: Explain *why* and *when*, not just *what*
+- **Include examples**: Show typical usage patterns
+- **Cross-reference**: Link to related types
+
+### 3. Maintenance
+
+- Update docs when code changes
+- Run `make docs` before releasing
+- Review generated docs for broken links
+- Use `// MARK: -` to organize code sections
+
+### 4. Testing Documentation
+
+Before committing:
+1. Generate docs: `make docs`
+2. Check for warnings in build output
+3. Open and verify: `make docs-open`
+4. Test code examples actually compile
+
+## Common Patterns
+
+### View Documentation Template
+
+```swift
+/// [Brief description of what this view displays]
+///
+/// [Detailed description of the view's purpose and contents]
+///
+/// ## Features
+/// - Feature one
+/// - Feature two
+///
+/// ## Usage
+/// ```swift
+/// [Example code]
+/// ```
+///
+/// - Note: [Important implementation notes]
+/// - SeeAlso: ``RelatedView``
+struct MyView: View {
+    /// [Description of property]
+    let property: Type
+}
+```
+
+### Service Documentation Template
+
+```swift
+/// [Brief description of service responsibility]
+///
+/// This service handles:
+/// - Responsibility one
+/// - Responsibility two
+///
+/// ## Usage
+/// ```swift
+/// let service = MyService()
+/// await service.performAction()
+/// ```
+///
+/// - Important: [Thread-safety, lifecycle, or initialization notes]
+final class MyService {
+    /// [Method description]
+    ///
+    /// - Parameter param: [Parameter description]
+    /// - Returns: [Return value description]
+    /// - Throws: [Error conditions]
+    func myMethod(param: String) async throws -> Result { }
+}
+```
+
+### Model Documentation Template
+
+```swift
+/// [Brief description of what this model represents]
+///
+/// [Additional context about the model's purpose]
+///
+/// ## Properties
+/// - ``property1``: [Brief description]
+/// - ``property2``: [Brief description]
+///
+/// ## Example
+/// ```swift
+/// let model = MyModel(...)
+/// ```
+struct MyModel {
+    /// [Property description with context]
+    var property1: String
+}
+```
+
+## Troubleshooting
+
+### Documentation Not Generating
+
+1. Check for syntax errors in Swift files
+2. Ensure scheme is shared: **Product → Scheme → Manage Schemes** → Check "Shared"
+3. Clean build folder: `xcodebuild clean`
+4. Check Xcode version: DocC requires Xcode 13+
+
+### Broken Cross-References
+
+- Use exact type names (case-sensitive)
+- Include module name if ambiguous: ``ModuleName/TypeName``
+- Check spelling in double backticks
+
+### Missing Types in Documentation
+
+- Only public and open types are documented by default
+- Internal types require `-include-internal` flag
+- Private types are never included
+
+## References
+
+- [Apple DocC Documentation](https://www.swift.org/documentation/docc/)
+- [Writing Great Documentation](https://developer.apple.com/documentation/xcode/writing-symbol-documentation-in-your-source-files)
+- [DocC Tutorial](https://developer.apple.com/documentation/docc/documenting-a-swift-framework-or-package)

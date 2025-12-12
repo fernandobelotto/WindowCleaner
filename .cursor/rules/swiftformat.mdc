@@ -1,0 +1,114 @@
+---
+globs: **/*.swift
+alwaysApply: false
+---
+# SwiftFormat — Code Formatting
+
+This project uses [SwiftFormat](https://github.com/nicklockwood/SwiftFormat) for consistent Swift code formatting.
+
+## Installation
+
+SwiftFormat is installed via Homebrew:
+
+```bash
+brew install swiftformat
+```
+
+To update:
+
+```bash
+brew upgrade swiftformat
+```
+
+## Usage
+
+### Format All Swift Files
+
+```bash
+cd /Users/fernandobosco/Projects/MacAppTemplate
+swiftformat .
+```
+
+### Format Specific File or Directory
+
+```bash
+swiftformat MacAppTemplate/
+swiftformat MacAppTemplate/ContentView.swift
+```
+
+### Lint Mode (Check Without Modifying)
+
+```bash
+swiftformat --lint .
+```
+
+### Verbose Mode (See Which Rules Applied)
+
+```bash
+swiftformat --verbose .
+```
+
+## Configuration
+
+The project uses a `.swiftformat` file in the root directory with inferred options from the existing codebase. Key settings include:
+
+- **Indentation**: 4 spaces (`--indent 4`)
+- **Self**: Removed when redundant (`--self remove`)
+- **Trailing Commas**: Always included (`--trailing-commas always`)
+- **Import Grouping**: Alphabetical (`--import-grouping alpha`)
+- **Line Breaks**: Unix-style LF (`--linebreaks lf`)
+- **Void Type**: `Void` keyword (`--void-type Void`)
+
+## Disabling Rules Locally
+
+To disable formatting for specific code:
+
+```swift
+// swiftformat:disable <rule1> [<rule2>]
+let customFormatted = "preserved"
+// swiftformat:enable <rule1> [<rule2>]
+```
+
+For a single line:
+
+```swift
+// swiftformat:disable:next redundantSelf
+self.customMethod() // This self won't be removed
+```
+
+## When Writing Swift Code
+
+1. **Run `swiftformat .` before committing** to ensure consistent formatting
+2. **Use lint mode in CI** with `swiftformat --lint .` to catch formatting issues
+3. **Preserve intentional formatting** using `// swiftformat:disable` comments when needed
+
+## Common Rules Reference
+
+| Rule | Description |
+|------|-------------|
+| `redundantSelf` | Removes unnecessary `self.` references |
+| `trailingCommas` | Adds/removes trailing commas in collections |
+| `sortImports` | Alphabetically sorts import statements |
+| `blankLineAfterImports` | Ensures blank line after imports |
+| `indent` | Normalizes indentation |
+| `wrap` | Handles line wrapping |
+
+## Integrating with Xcode Build Phase (Optional)
+
+To auto-format on every build, add a Run Script phase before "Compile Sources":
+
+```bash
+if which swiftformat >/dev/null; then
+  swiftformat "$SRCROOT"
+else
+  echo "warning: SwiftFormat not installed"
+fi
+```
+
+**Note**: Set `ENABLE_USER_SCRIPT_SANDBOXING` to `NO` in Build Settings.
+
+## References
+
+- [SwiftFormat GitHub](https://github.com/nicklockwood/SwiftFormat)
+- [Rules Documentation](https://github.com/nicklockwood/SwiftFormat/blob/main/Rules.md)
+- @.swiftformat — Project configuration file

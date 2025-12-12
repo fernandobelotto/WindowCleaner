@@ -1,0 +1,245 @@
+---
+description: SwiftUI view conventions and patterns for macOS
+globs: 
+  - "**/*View.swift"
+  - "**/Views/**/*.swift"
+  - "**/Components/**/*.swift"
+alwaysApply: false
+---
+
+# SwiftUI View Guidelines
+
+## View Structure
+
+Follow this structure for SwiftUI views:
+
+```swift
+import SwiftUI
+import SwiftData  // Only if using SwiftData queries
+
+struct ExampleView: View {
+    // MARK: - Environment & State
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    
+    // MARK: - Query (SwiftData)
+    @Query private var items: [Item]
+    
+    // MARK: - State
+    @State private var searchText = ""
+    @State private var isShowingSheet = false
+    
+    // MARK: - Properties
+    let title: String
+    var onAction: (() -> Void)?
+    
+    // MARK: - Body
+    var body: some View {
+        content
+            .navigationTitle(title)
+            .toolbar { toolbarContent }
+            .sheet(isPresented: $isShowingSheet) { sheetContent }
+    }
+    
+    // MARK: - View Components
+    @ViewBuilder
+    private var content: some View {
+        // Main content
+    }
+    
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        // Toolbar items
+    }
+    
+    @ViewBuilder
+    private var sheetContent: some View {
+        // Sheet content
+    }
+    
+    // MARK: - Actions
+    private func performAction() {
+        // Action implementation
+    }
+}
+
+// MARK: - Preview
+#Preview {
+    ExampleView(title: "Example")
+        .modelContainer(for: Item.self, inMemory: true)
+}
+```
+
+## NavigationSplitView Pattern
+
+For master-detail interfaces (standard macOS pattern):
+
+```swift
+struct ContentView: View {
+    @State private var selectedItem: Item?
+    @Query private var items: [Item]
+    
+    var body: some View {
+        NavigationSplitView {
+            // Sidebar
+            List(items, selection: $selectedItem) { item in
+                NavigationLink(value: item) {
+                    ItemRow(item: item)
+                }
+            }
+            .navigationSplitViewColumnWidth(min: 180, ideal: 200, max: 300)
+        } detail: {
+            // Detail view
+            if let item = selectedItem {
+                ItemDetailView(item: item)
+            } else {
+                ContentUnavailableView("Select an Item", systemImage: "doc")
+            }
+        }
+    }
+}
+```
+
+## View Composition
+
+### Extract Subviews
+
+Keep views small and focused. Extract into separate views when:
+- A section exceeds ~50 lines
+- Logic is reusable
+- The view has its own state
+
+```swift
+// ✅ Good - extracted component
+struct ItemRow: View {
+    let item: Item
+    
+    var body: some View {
+        HStack {
+            Image(systemName: item.icon)
+            VStack(alignment: .leading) {
+                Text(item.title)
+                    .font(.headline)
+                Text(item.subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+```
+
+### Use ViewBuilder for Conditional Content
+
+```swift
+@ViewBuilder
+private var statusView: some View {
+    switch status {
+    case .loading:
+        ProgressView()
+    case .loaded(let data):
+        DataView(data: data)
+    case .error(let message):
+        ContentUnavailableView("Error", systemImage: "exclamationmark.triangle", description: Text(message))
+    }
+}
+```
+
+## Animations
+
+Use `withAnimation` for state changes that should animate:
+
+```swift
+private func addItem() {
+    withAnimation(.spring(duration: 0.3)) {
+        let newItem = Item(timestamp: Date())
+        modelContext.insert(newItem)
+    }
+}
+```
+
+## macOS-Specific Views
+
+### Use Native macOS Controls
+
+```swift
+// ✅ macOS-native table
+Table(items) {
+    TableColumn("Name", value: \.name)
+    TableColumn("Date") { item in
+        Text(item.date, style: .date)
+    }
+    TableColumn("Status") { item in
+        StatusBadge(status: item.status)
+    }
+}
+
+// ✅ Searchable with tokens
+.searchable(text: $searchText, tokens: $searchTokens) { token in
+    Label(token.name, systemImage: token.icon)
+}
+
+// ✅ Inspector panel
+.inspector(isPresented: $showInspector) {
+    InspectorView(item: selectedItem)
+        .inspectorColumnWidth(min: 200, ideal: 250, max: 300)
+}
+```
+
+### Keyboard Navigation
+
+```swift
+.focusable()
+.onKeyPress(.return) {
+    performAction()
+    return .handled
+}
+.onKeyPress(.delete) {
+    deleteSelected()
+    return .handled
+}
+```
+
+## Previews
+
+Always include previews with realistic data:
+
+```swift
+#Preview("Empty State") {
+    ContentView()
+        .modelContainer(for: Item.self, inMemory: true)
+}
+
+#Preview("With Data") {
+    let container = try! ModelContainer(for: Item.self, configurations: .init(isStoredInMemoryOnly: true))
+    let context = container.mainContext
+    
+    // Add sample data
+    for i in 1...5 {
+        context.insert(Item(title: "Item \(i)", timestamp: Date()))
+    }
+    
+    return ContentView()
+        .modelContainer(container)
+}
+
+#Preview("Dark Mode") {
+    ContentView()
+        .modelContainer(for: Item.self, inMemory: true)
+        .preferredColorScheme(.dark)
+}
+```
+
+## Accessibility
+
+- Always provide labels for icons and images
+- Use semantic colors (`.primary`, `.secondary`)
+- Test with VoiceOver
+
+```swift
+Button(action: addItem) {
+    Label("Add Item", systemImage: "plus")
+}
+.help("Add a new item (⌘N)")  // Tooltip
+.accessibilityHint("Double-click to add a new item to the list")
+```

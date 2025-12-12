@@ -1,0 +1,326 @@
+---
+description: Architecture patterns and project structure guidelines
+globs:
+alwaysApply: false
+---
+
+# Architecture Guidelines
+
+## Recommended Architecture
+
+This template follows a **lightweight MVVM** pattern optimized for SwiftUI + SwiftData:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         View Layer                          │
+│  SwiftUI Views with @Query, @State, @Environment            │
+├─────────────────────────────────────────────────────────────┤
+│                    ViewModel Layer (Optional)               │
+│  @Observable classes for complex business logic             │
+├─────────────────────────────────────────────────────────────┤
+│                       Model Layer                           │
+│  SwiftData @Model classes                                   │
+├─────────────────────────────────────────────────────────────┤
+│                     Service Layer                           │
+│  Networking, file operations, external integrations         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## When to Use ViewModels
+
+**Skip ViewModels when:**
+- View state is simple (few @State properties)
+- Data comes directly from SwiftData @Query
+- Business logic is minimal
+
+**Use ViewModels when:**
+- Complex state coordination across multiple views
+- Significant business logic or data transformation
+- Need to mock/test business logic independently
+- Integration with external services
+
+### ViewModel Pattern
+
+```swift
+import SwiftUI
+import Observation
+
+@Observable
+final class ProjectViewModel {
+    // MARK: - State
+    var projects: [Project] = []
+    var selectedProject: Project?
+    var isLoading = false
+    var error: AppError?
+    
+    // MARK: - Dependencies
+    private let projectService: ProjectServiceProtocol
+    private let modelContext: ModelContext
+    
+    // MARK: - Initialization
+    init(modelContext: ModelContext, projectService: ProjectServiceProtocol = ProjectService()) {
+        self.modelContext = modelContext
+        self.projectService = projectService
+    }
+    
+    // MARK: - Actions
+    func loadProjects() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            let descriptor = FetchDescriptor<Project>(sortBy: [SortDescriptor(\.name)])
+            projects = try modelContext.fetch(descriptor)
+        } catch {
+            self.error = .fetchFailed(error)
+        }
+    }
+    
+    func createProject(name: String) {
+        let project = Project(name: name)
+        modelContext.insert(project)
+        projects.append(project)
+    }
+}
+
+// Usage in View
+struct ProjectListView: View {
+    @Environment(\.modelContext) private var modelContext
+    @State private var viewModel: ProjectViewModel?
+    
+    var body: some View {
+        Group {
+            if let viewModel {
+                ProjectList(viewModel: viewModel)
+            } else {
+                ProgressView()
+            }
+        }
+        .task {
+            viewModel = ProjectViewModel(modelContext: modelContext)
+            await viewModel?.loadProjects()
+        }
+    }
+}
+```
+
+## Service Layer
+
+Services handle external operations:
+
+```swift
+// Protocol for testability
+protocol ProjectServiceProtocol: Sendable {
+    func syncProjects() async throws -> [ProjectDTO]
+    func uploadProject(_ project: Project) async throws
+}
+
+// Implementation
+final class ProjectService: ProjectServiceProtocol {
+    private let urlSession: URLSession
+    private let baseURL: URL
+    
+    init(urlSession: URLSession = .shared, baseURL: URL = Config.apiBaseURL) {
+        self.urlSession = urlSession
+        self.baseURL = baseURL
+    }
+    
+    func syncProjects() async throws -> [ProjectDTO] {
+        let url = baseURL.appendingPathComponent("projects")
+        let (data, _) = try await urlSession.data(from: url)
+        return try JSONDecoder().decode([ProjectDTO].self, from: data)
+    }
+}
+```
+
+## Error Handling Architecture
+
+Define app-specific errors:
+
+```swift
+enum AppError: LocalizedError {
+    case fetchFailed(Error)
+    case saveFailed(Error)
+    case networkError(Error)
+    case validationError(String)
+    case unauthorized
+    
+    var errorDescription: String? {
+        switch self {
+        case .fetchFailed:
+            return "Failed to load data"
+        case .saveFailed:
+            return "Failed to save changes"
+        case .networkError:
+            return "Network connection failed"
+        case .validationError(let message):
+            return message
+        case .unauthorized:
+            return "Please sign in to continue"
+        }
+    }
+    
+    var recoverySuggestion: String? {
+        switch self {
+        case .networkError:
+            return "Check your internet connection and try again."
+        case .unauthorized:
+            return "Your session may have expired."
+        default:
+            return "Please try again."
+        }
+    }
+}
+```
+
+## Dependency Injection
+
+Use environment for app-wide dependencies:
+
+```swift
+// Define environment key
+private struct ProjectServiceKey: EnvironmentKey {
+    static let defaultValue: ProjectServiceProtocol = ProjectService()
+}
+
+extension EnvironmentValues {
+    var projectService: ProjectServiceProtocol {
+        get { self[ProjectServiceKey.self] }
+        set { self[ProjectServiceKey.self] = newValue }
+    }
+}
+
+// Inject in app
+@main
+struct MacAppTemplateApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+        .environment(\.projectService, ProjectService())
+    }
+}
+
+// Use in view
+struct SyncView: View {
+    @Environment(\.projectService) private var projectService
+    
+    var body: some View {
+        Button("Sync") {
+            Task {
+                try await projectService.syncProjects()
+            }
+        }
+    }
+}
+```
+
+## File Organization (Expanded)
+
+```
+MacAppTemplate/
+├── App/
+│   ├── MacAppTemplateApp.swift      # App entry point
+│   └── AppDelegate.swift            # If needed for AppKit integration
+│
+├── Models/
+│   ├── Item.swift                   # SwiftData models
+│   ├── Project.swift
+│   └── DTOs/                        # Data transfer objects
+│       └── ProjectDTO.swift
+│
+├── Views/
+│   ├── ContentView.swift            # Main view
+│   ├── Screens/                     # Full-screen views
+│   │   ├── ProjectListView.swift
+│   │   └── SettingsView.swift
+│   └── Components/                  # Reusable components
+│       ├── ItemRow.swift
+│       └── StatusBadge.swift
+│
+├── ViewModels/                      # Only if needed
+│   └── ProjectViewModel.swift
+│
+├── Services/
+│   ├── ProjectService.swift
+│   └── Protocols/
+│       └── ProjectServiceProtocol.swift
+│
+├── Utilities/
+│   ├── Extensions/
+│   │   ├── Date+Formatting.swift
+│   │   └── View+Modifiers.swift
+│   ├── Helpers/
+│   │   └── Validator.swift
+│   └── Constants.swift
+│
+├── Resources/
+│   ├── Assets.xcassets
+│   └── Localizable.xcstrings
+│
+└── Supporting Files/
+    └── Info.plist                   # If not auto-generated
+```
+
+## Navigation Patterns
+
+### Coordinator Pattern (for complex navigation)
+
+```swift
+@Observable
+final class NavigationCoordinator {
+    var path = NavigationPath()
+    var presentedSheet: Sheet?
+    var presentedAlert: AlertItem?
+    
+    enum Sheet: Identifiable {
+        case newProject
+        case editProject(Project)
+        case settings
+        
+        var id: String {
+            switch self {
+            case .newProject: return "newProject"
+            case .editProject(let p): return "edit-\(p.id)"
+            case .settings: return "settings"
+            }
+        }
+    }
+    
+    func showNewProject() {
+        presentedSheet = .newProject
+    }
+    
+    func showEditProject(_ project: Project) {
+        presentedSheet = .editProject(project)
+    }
+    
+    func dismissSheet() {
+        presentedSheet = nil
+    }
+}
+```
+
+## Constants & Configuration
+
+```swift
+enum Config {
+    static let apiBaseURL = URL(string: "https://api.example.com")!
+    static let maxItemsPerPage = 50
+    static let animationDuration = 0.3
+}
+
+enum Metrics {
+    static let sidebarMinWidth: CGFloat = 180
+    static let sidebarIdealWidth: CGFloat = 220
+    static let sidebarMaxWidth: CGFloat = 300
+    static let cornerRadius: CGFloat = 8
+    static let spacing: CGFloat = 16
+}
+```
+
+## References
+
+- @MacAppTemplateApp.swift — App structure
+- @ContentView.swift — View layer example
+- @Item.swift — Model layer example

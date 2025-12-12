@@ -1,0 +1,179 @@
+---
+description: Core project conventions for macOS SwiftUI + SwiftData app
+globs:
+alwaysApply: true
+---
+
+# MacAppTemplate — Project Rules
+
+This is a **macOS application template** using SwiftUI and SwiftData, targeting **macOS 15.6+** with **Swift 6** concurrency features.
+
+## Technology Stack
+
+- **UI Framework**: SwiftUI with NavigationSplitView pattern
+- **Persistence**: SwiftData (ModelContainer, @Model, @Query)
+- **Concurrency**: Swift 6 with @MainActor default isolation
+- **Testing**: Swift Testing framework (@Test) + XCUITest
+- **Security**: App Sandbox + Hardened Runtime enabled
+- **Code Formatting**: SwiftFormat (via Homebrew CLI)
+- **Code Linting**: SwiftLint (via Xcode Build Tool Plugin)
+
+## Swift Conventions
+
+### Concurrency & Actor Isolation
+
+- Default actor isolation is `@MainActor` — UI code runs on main actor automatically
+- Use `nonisolated` explicitly when computation can safely run off main actor
+- Prefer `async/await` over completion handlers
+- Use `Task { }` for launching async work from synchronous contexts
+
+```swift
+// ✅ Correct - explicit isolation when needed
+nonisolated func computeExpensiveResult() async -> Result { ... }
+
+// ✅ Correct - Task for async work in view actions
+Button("Process") {
+    Task {
+        await viewModel.processData()
+    }
+}
+```
+
+### Code Style
+
+- Use Swift's modern concise syntax (implicit returns, trailing closures)
+- Prefer `let` over `var` when value won't change
+- Use meaningful names — avoid abbreviations except well-known ones (id, url, etc.)
+- Keep files focused — one primary type per file
+- Use `// MARK: -` to organize code sections in larger files
+
+### Error Handling
+
+- Use Swift's typed throws where appropriate
+- Provide user-friendly error messages for UI-facing errors
+- Log detailed errors for debugging using `os.Logger`
+
+```swift
+import os
+
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "DataSync")
+
+func syncData() async throws {
+    do {
+        try await performSync()
+    } catch {
+        logger.error("Sync failed: \(error.localizedDescription)")
+        throw AppError.syncFailed(underlying: error)
+    }
+}
+```
+
+## macOS-Specific Guidelines
+
+### Window Management
+
+- Use `WindowGroup` for document-based or multi-window apps
+- Use `Window` for utility windows with specific sizes
+- Use `Settings` scene for preferences window (⌘,)
+
+```swift
+@main
+struct MacAppTemplateApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+        .modelContainer(sharedModelContainer)
+        
+        Settings {
+            SettingsView()
+        }
+    }
+}
+```
+
+### Menu Bar & Commands
+
+- Add keyboard shortcuts for common actions
+- Use `.commands` modifier to add menu items
+- Follow macOS HIG for standard menu structure
+
+```swift
+.commands {
+    CommandGroup(after: .newItem) {
+        Button("New from Template...") {
+            // action
+        }
+        .keyboardShortcut("N", modifiers: [.command, .shift])
+    }
+}
+```
+
+### App Sandbox Considerations
+
+- Request only necessary entitlements
+- Use security-scoped bookmarks for persistent file access
+- Handle permission denials gracefully with user feedback
+
+## File Organization
+
+```
+MacAppTemplate/
+├── MacAppTemplateApp.swift    # App entry point, scene configuration
+├── ContentView.swift          # Main view
+├── Models/                    # SwiftData models
+│   └── Item.swift
+├── Views/                     # SwiftUI views
+│   ├── Components/            # Reusable view components
+│   └── Screens/               # Full-screen views
+├── ViewModels/                # ObservableObject view models (if needed)
+├── Services/                  # Business logic, networking, etc.
+├── Utilities/                 # Extensions, helpers
+└── Resources/                 # Assets, localization
+```
+
+## Build & Run
+
+Use XcodeBuildMCP tools for building and testing:
+
+```
+// Build for macOS
+build_macos({ projectPath: 'MacAppTemplate.xcodeproj', scheme: 'MacAppTemplate' })
+
+// Run tests
+test_macos({ projectPath: 'MacAppTemplate.xcodeproj', scheme: 'MacAppTemplate' })
+```
+
+## Code Formatting
+
+Run SwiftFormat before committing changes:
+
+```bash
+swiftformat .
+```
+
+See @swiftformat.mdc for detailed configuration and usage.
+
+## Code Linting
+
+SwiftLint runs automatically on every build via the Xcode Build Tool Plugin. It enforces:
+
+- Swift style conventions (naming, spacing, line length)
+- Code quality rules (prefer `isEmpty`, avoid force unwrapping)
+- Safety rules (discouraged optionals, fatal error messages)
+
+Violations appear as Xcode warnings/errors. To fix correctable issues manually:
+
+```bash
+swiftlint --fix
+```
+
+See @swiftlint.mdc for detailed configuration and usage.
+
+## References
+
+- @MacAppTemplateApp.swift — App entry point with ModelContainer setup
+- @ContentView.swift — Main NavigationSplitView implementation
+- @Item.swift — SwiftData model example
+- @.swiftformat — SwiftFormat configuration
+- @.swiftlint.yml — SwiftLint configuration

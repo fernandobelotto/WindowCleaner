@@ -1,0 +1,323 @@
+---
+description: Testing conventions for Swift Testing and XCUITest
+globs:
+  - "**/*Tests.swift"
+  - "**/*Test.swift"
+  - "**/Tests/**/*.swift"
+alwaysApply: false
+---
+
+# Testing Guidelines
+
+This project uses **Swift Testing** (new framework) for unit tests and **XCUITest** for UI tests.
+
+## Swift Testing Framework
+
+### Basic Test Structure
+
+```swift
+import Testing
+@testable import MacAppTemplate
+
+struct ItemTests {
+    // MARK: - Setup
+    
+    let sampleItem = Item(title: "Test", timestamp: Date())
+    
+    // MARK: - Tests
+    
+    @Test("Item initializes with correct values")
+    func itemInitialization() {
+        let item = Item(title: "Hello", timestamp: Date())
+        
+        #expect(item.title == "Hello")
+        #expect(item.timestamp <= Date())
+    }
+    
+    @Test("Item title can be updated")
+    func itemTitleUpdate() {
+        let item = Item(title: "Original")
+        item.title = "Updated"
+        
+        #expect(item.title == "Updated")
+    }
+}
+```
+
+### Async Tests
+
+```swift
+@Test("Data fetches successfully")
+func asyncDataFetch() async throws {
+    let service = DataService()
+    let result = try await service.fetchData()
+    
+    #expect(result.count > 0)
+}
+```
+
+### Parameterized Tests
+
+```swift
+@Test("Validation handles various inputs", arguments: [
+    ("", false),
+    ("a", false),
+    ("valid", true),
+    ("valid title", true)
+])
+func titleValidation(title: String, expectedValid: Bool) {
+    let isValid = Validator.isValidTitle(title)
+    #expect(isValid == expectedValid)
+}
+```
+
+### Test Organization with Tags
+
+```swift
+extension Tag {
+    @Tag static var model: Self
+    @Tag static var viewModel: Self
+    @Tag static var integration: Self
+}
+
+@Test("Model serialization", .tags(.model))
+func modelSerialization() { ... }
+
+@Test("ViewModel state updates", .tags(.viewModel))
+func viewModelState() { ... }
+```
+
+### Expected Failures
+
+```swift
+@Test("Known bug - will be fixed in v2")
+@available(*, deprecated, message: "Remove when bug #123 is fixed")
+func knownBugTest() async throws {
+    withKnownIssue {
+        // This test documents a known bug
+        #expect(buggyFunction() == expectedValue)
+    }
+}
+```
+
+### Test Conditions
+
+```swift
+@Test("Feature requires macOS 15", .enabled(if: ProcessInfo.processInfo.operatingSystemVersion.majorVersion >= 15))
+func newFeatureTest() { ... }
+
+@Test("Skip in CI", .disabled("Requires user interaction"))
+func manualTest() { ... }
+```
+
+## Testing SwiftData Models
+
+### In-Memory Container for Tests
+
+```swift
+import Testing
+import SwiftData
+@testable import MacAppTemplate
+
+struct ItemModelTests {
+    // Create in-memory container for each test
+    func makeContainer() throws -> ModelContainer {
+        let schema = Schema([Item.self])
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [config])
+    }
+    
+    @Test("Item persists correctly")
+    func itemPersistence() throws {
+        let container = try makeContainer()
+        let context = container.mainContext
+        
+        // Create
+        let item = Item(title: "Test Item")
+        context.insert(item)
+        try context.save()
+        
+        // Fetch
+        let descriptor = FetchDescriptor<Item>()
+        let items = try context.fetch(descriptor)
+        
+        #expect(items.count == 1)
+        #expect(items.first?.title == "Test Item")
+    }
+    
+    @Test("Item deletion works")
+    func itemDeletion() throws {
+        let container = try makeContainer()
+        let context = container.mainContext
+        
+        let item = Item(title: "To Delete")
+        context.insert(item)
+        try context.save()
+        
+        context.delete(item)
+        try context.save()
+        
+        let descriptor = FetchDescriptor<Item>()
+        let items = try context.fetch(descriptor)
+        
+        #expect(items.isEmpty)
+    }
+}
+```
+
+## XCUITest for UI Testing
+
+### Basic UI Test Structure
+
+```swift
+import XCTest
+
+final class MacAppTemplateUITests: XCTestCase {
+    var app: XCUIApplication!
+    
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launchArguments = ["--uitesting"]
+        app.launch()
+    }
+    
+    override func tearDownWithError() throws {
+        app = nil
+    }
+    
+    @MainActor
+    func testAddItem() throws {
+        // Find and click Add button
+        let addButton = app.buttons["Add Item"]
+        XCTAssertTrue(addButton.exists)
+        addButton.click()
+        
+        // Verify item was added
+        let list = app.outlines.firstMatch
+        XCTAssertTrue(list.cells.count > 0)
+    }
+    
+    @MainActor
+    func testDeleteItem() throws {
+        // Add an item first
+        app.buttons["Add Item"].click()
+        
+        // Select and delete
+        let firstCell = app.outlines.firstMatch.cells.firstMatch
+        firstCell.click()
+        app.typeKey(.delete, modifierFlags: [])
+        
+        // Verify deletion
+        // Add verification logic
+    }
+}
+```
+
+### UI Test Best Practices
+
+```swift
+@MainActor
+func testNavigationFlow() throws {
+    // Use accessibility identifiers for reliable element finding
+    let sidebar = app.outlines["SidebarList"]
+    let detailView = app.groups["DetailView"]
+    
+    // Click first item
+    let firstItem = sidebar.cells.firstMatch
+    XCTAssertTrue(firstItem.waitForExistence(timeout: 2))
+    firstItem.click()
+    
+    // Verify detail view updates
+    XCTAssertTrue(detailView.staticTexts["ItemTitle"].exists)
+}
+
+@MainActor
+func testKeyboardShortcut() throws {
+    // Test ⌘N shortcut
+    app.typeKey("n", modifierFlags: .command)
+    
+    // Verify new item dialog or behavior
+    XCTAssertTrue(app.sheets.firstMatch.waitForExistence(timeout: 1))
+}
+```
+
+### Performance Testing
+
+```swift
+@MainActor
+func testLaunchPerformance() throws {
+    measure(metrics: [XCTApplicationLaunchMetric()]) {
+        XCUIApplication().launch()
+    }
+}
+
+@MainActor
+func testScrollPerformance() throws {
+    // Add many items first via launch arguments
+    app.launchArguments = ["--uitesting", "--populate-test-data"]
+    app.launch()
+    
+    let list = app.outlines.firstMatch
+    
+    measure(metrics: [XCTOSSignpostMetric.scrollingAndDecelerationMetric]) {
+        list.swipeUp()
+        list.swipeDown()
+    }
+}
+```
+
+## Adding Accessibility Identifiers
+
+In your views, add identifiers for UI testing:
+
+```swift
+struct ContentView: View {
+    var body: some View {
+        NavigationSplitView {
+            List { ... }
+                .accessibilityIdentifier("SidebarList")
+        } detail: {
+            DetailView()
+                .accessibilityIdentifier("DetailView")
+        }
+    }
+}
+```
+
+## Test Naming Conventions
+
+- Unit tests: `test[Feature]_[Scenario]_[ExpectedResult]`
+- UI tests: `test[UserAction]` or `test[Feature]Flow`
+
+```swift
+// Unit test examples
+@Test func itemCreation_withValidTitle_succeeds() { }
+@Test func itemValidation_withEmptyTitle_fails() { }
+
+// UI test examples
+func testAddItemButton() { }
+func testNavigationToDetailView() { }
+func testSearchFilteringFlow() { }
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+xcodebuild test -project MacAppTemplate.xcodeproj -scheme MacAppTemplate
+
+# Run specific test
+xcodebuild test -project MacAppTemplate.xcodeproj -scheme MacAppTemplate -only-testing:MacAppTemplateTests/ItemTests/testItemInitialization
+```
+
+Or use XcodeBuildMCP:
+
+```
+test_macos({ projectPath: 'MacAppTemplate.xcodeproj', scheme: 'MacAppTemplate' })
+```
+
+## References
+
+- @MacAppTemplateTests.swift — Unit test example
+- @MacAppTemplateUITests.swift — UI test example

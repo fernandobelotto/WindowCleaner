@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- App Sandbox enabled for security -->
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	
+	<!-- Allow read/write access to user-selected files -->
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
+	
+	<!-- 
+	Additional entitlements you may want to enable:
+	
+	Network access (client):
+	<key>com.apple.security.network.client</key>
+	<true/>
+	
+	Network access (server):
+	<key>com.apple.security.network.server</key>
+	<true/>
+	
+	Camera access:
+	<key>com.apple.security.device.camera</key>
+	<true/>
+	
+	Microphone access:
+	<key>com.apple.security.device.microphone</key>
+	<true/>
+	
+	Location access:
+	<key>com.apple.security.personal-information.location</key>
+	<true/>
+	
+	Photos library access (read-only):
+	<key>com.apple.security.personal-information.photos-library</key>
+	<true/>
+	
+	Downloads folder access:
+	<key>com.apple.security.files.downloads.read-write</key>
+	<true/>
+	
+	USB device access:
+	<key>com.apple.security.device.usb</key>
+	<true/>
+	
+	Print:
+	<key>com.apple.security.print</key>
+	<true/>
+	-->
+</dict>
+</plist>
+
+
+
+
+
+
+
+
+
