@@ -6,7 +6,7 @@ import SwiftUI
 // MARK: - App Entry Point
 
 @main
-struct MacAppTemplateApp: App {
+struct WindowCleanerApp: App {
     // MARK: - Store Manager
 
     /// Shared store manager for In-App Purchases
@@ -29,7 +29,7 @@ struct MacAppTemplateApp: App {
         // Main Window
         WindowGroup {
             MainContentView()
-                .frame(minWidth: 600, minHeight: 400)
+                .frame(minWidth: 700, minHeight: 500)
                 .environment(storeManager)
         }
         .modelContainer(sharedModelContainer)
@@ -37,8 +37,17 @@ struct MacAppTemplateApp: App {
             appCommands
         }
 
+        // Menu Bar Extra
+        MenuBarExtra {
+            MenuBarPopover()
+                .modelContainer(sharedModelContainer)
+        } label: {
+            Label("Window Cleaner", systemImage: "macwindow.badge.plus")
+        }
+        .menuBarExtraStyle(.window)
+
         // Welcome Window (standalone auxiliary window)
-        Window("Welcome to MacAppTemplate", id: WindowID.welcome.rawValue) {
+        Window("Welcome to Window Cleaner", id: WindowID.welcome.rawValue) {
             WelcomeView()
         }
         .windowResizability(.contentSize)
@@ -63,29 +72,18 @@ struct MacAppTemplateApp: App {
     // MARK: - Commands
 
     @CommandsBuilder private var appCommands: some Commands {
-        // File Menu Commands - Replace default "New Window" with "New Item"
+        // File Menu Commands
         CommandGroup(replacing: .newItem) {
-            Button("New Item") {
-                NotificationCenter.default.post(name: .createNewItem, object: nil)
-            }
-            .keyboardShortcut("n", modifiers: .command)
+            // No "New Item" for WindowCleaner
         }
 
         // Edit Menu Commands
         CommandGroup(after: .pasteboard) {
-            Button("Duplicate") {
-                NotificationCenter.default.post(name: .duplicateSelectedItem, object: nil)
-            }
-            .keyboardShortcut("d", modifiers: .command)
-
-            Button("Delete") {
-                NotificationCenter.default.post(name: .deleteSelectedItem, object: nil)
-            }
-            .keyboardShortcut(.delete, modifiers: [])
+            // No edit commands needed
         }
 
         // View Menu Commands
-        ViewCommands()
+        WindowCleanerViewCommands()
 
         // Store Menu Commands
         StoreCommands()
@@ -95,13 +93,13 @@ struct MacAppTemplateApp: App {
 
         // Help Menu
         CommandGroup(replacing: .help) {
-            if let docsURL = URL(string: "https://github.com/fernandobelotto/MacAppTemplate") {
-                Link("MacAppTemplate Documentation", destination: docsURL)
+            if let docsURL = URL(string: "https://github.com/fernandobelotto/WindowCleaner") {
+                Link("Window Cleaner Documentation", destination: docsURL)
             }
 
             Divider()
 
-            if let issuesURL = URL(string: "https://github.com/fernandobelotto/MacAppTemplate/issues") {
+            if let issuesURL = URL(string: "https://github.com/fernandobelotto/WindowCleaner/issues") {
                 Link("Report an Issue", destination: issuesURL)
             }
         }
@@ -116,10 +114,10 @@ struct MacAppTemplateApp: App {
 // MARK: - View Commands
 
 /// Commands for the View menu.
-struct ViewCommands: Commands {
+struct WindowCleanerViewCommands: Commands {
     var body: some Commands {
         CommandGroup(after: .sidebar) {
-            Button("Refresh") {
+            Button("Refresh Apps") {
                 NotificationCenter.default.post(name: .refreshContent, object: nil)
             }
             .keyboardShortcut("r", modifiers: .command)
@@ -130,6 +128,13 @@ struct ViewCommands: Commands {
                 NotificationCenter.default.post(name: .toggleSidebar, object: nil)
             }
             .keyboardShortcut("s", modifiers: [.command, .control])
+
+            Divider()
+
+            Button("Clean Up Stale Apps") {
+                NotificationCenter.default.post(name: .cleanUpStaleApps, object: nil)
+            }
+            .keyboardShortcut("k", modifiers: .command)
         }
     }
 }
@@ -167,7 +172,7 @@ struct ViewCommands: Commands {
 
                 Divider()
 
-                Button("Clear All Data") {
+                Button("Clear Usage History") {
                     NotificationCenter.default.post(name: .clearAllData, object: nil)
                 }
                 .keyboardShortcut("d", modifiers: [.command, .option])
@@ -264,4 +269,11 @@ struct MainContentView: View {
                 await NotificationManager.shared.requestAuthorization()
             }
     }
+}
+
+// MARK: - Notification Names
+
+extension Notification.Name {
+    /// Posted to trigger cleanup of stale apps
+    static let cleanUpStaleApps = Notification.Name("cleanUpStaleApps")
 }

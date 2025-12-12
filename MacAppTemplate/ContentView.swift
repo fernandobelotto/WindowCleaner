@@ -4,128 +4,156 @@ import SwiftUI
 
 // MARK: - ContentView
 
-/// Main content view composing the NavigationSplitView with sidebar and detail areas.
-///
-/// Acts as the compositor, delegating to:
-/// - `SidebarView` for the sidebar list
-/// - `DetailView` for the detail area
-/// - `ContentViewModel` for state and actions
+/// Main content view for WindowCleaner showing running applications.
 struct ContentView: View {
     // MARK: - Environment
 
     @Environment(\.modelContext)
     private var modelContext
 
-    @Environment(\.undoManager)
-    private var undoManager
-
-    // MARK: - Query
-
-    @Query(sort: \Item.timestamp, order: .reverse)
-    private var items: [Item]
-
     // MARK: - State
 
-    @State
-    private var viewModel: ContentViewModel?
+    @State private var viewModel = AppTrackingViewModel()
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
 
     // MARK: - Body
 
     var body: some View {
-        Group {
-            if let viewModel {
-                mainContent(viewModel: viewModel)
-            } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            AppListView(viewModel: viewModel)
+                .navigationSplitViewColumnWidth(
+                    min: 280,
+                    ideal: 320,
+                    max: 400
+                )
+        } detail: {
+            detailContent
+        }
+        .navigationTitle("Window Cleaner")
+        .toolbar {
+            toolbarContent
         }
         .task {
-            viewModel = ContentViewModel(modelContext: modelContext)
+            startTracking()
         }
-        .onChange(of: undoManager) { _, newValue in
-            modelContext.undoManager = newValue
+        .onDisappear {
+            viewModel.stopTracking()
+        }
+        .alert("Error", isPresented: .init(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.clearError() } }
+        )) {
+            Button("OK") {
+                viewModel.clearError()
+            }
+        } message: {
+            if let error = viewModel.errorMessage {
+                Text(error)
+            }
+        }
+        .alert("Clean Up Apps?", isPresented: $viewModel.showCleanupConfirmation) {
+            Button("Cancel", role: .cancel) {
+                viewModel.cancelCleanup()
+            }
+            Button("Quit Apps", role: .destructive) {
+                viewModel.executeCleanup()
+            }
+        } message: {
+            Text("This will quit \(viewModel.pendingCleanupApps.count) stale apps, freeing approximately \(viewModel.potentialSavings) of memory.")
         }
     }
 
-    // MARK: - Main Content
+    // MARK: - Detail Content
 
     @ViewBuilder
-    private func mainContent(viewModel: ContentViewModel) -> some View {
-        NavigationSplitView(columnVisibility: Binding(
-            get: { viewModel.columnVisibility },
-            set: { viewModel.columnVisibility = $0 }
-        )) {
-            SidebarView(
-                items: items,
-                selectedItem: Binding(
-                    get: { viewModel.selectedItem },
-                    set: { viewModel.selectedItem = $0 }
-                ),
-                viewModel: viewModel
+    private var detailContent: some View {
+        if let app = viewModel.selectedApp {
+            AppDetailView(
+                app: app,
+                onQuit: {
+                    viewModel.quitApp(app)
+                    viewModel.selectApp(nil)
+                },
+                onToggleProtection: {
+                    viewModel.toggleProtection(for: app)
+                }
             )
-        } detail: {
-            DetailView(items: items, viewModel: viewModel)
-        }
-        .contentViewNotifications(viewModel: viewModel, items: items)
-        .onAppear { modelContext.undoManager = undoManager }
-        .onChange(of: viewModel.selectedItem) { _, _ in
-            viewModel.handleSelectionChange()
+        } else {
+            EmptyDetailView()
         }
     }
-}
 
-// MARK: - Notification Handling Modifier
+    // MARK: - Toolbar
 
-private extension View {
-    /// Attaches notification handlers for ContentView actions.
-    func contentViewNotifications(viewModel: ContentViewModel, items: [Item]) -> some View {
-        onReceive(NotificationCenter.default.publisher(for: .createNewItem)) { _ in
-            viewModel.addItem()
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            systemMemoryIndicator
         }
-        .onReceive(NotificationCenter.default.publisher(for: .deleteSelectedItem)) { _ in
-            if let item = viewModel.selectedItem { viewModel.deleteItem(item) }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .duplicateSelectedItem)) { _ in
-            if let item = viewModel.selectedItem { viewModel.duplicateItem(item) }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .toggleSidebar)) { _ in
-            viewModel.toggleSidebar()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .refreshContent)) { _ in
-            viewModel.refreshContent()
-        }
-        #if DEBUG
-        .onReceive(NotificationCenter.default.publisher(for: .clearAllData)) { _ in
-                viewModel.showClearDataAlert = true
+
+        ToolbarItem(placement: .primaryAction) {
+            Button {
+                viewModel.refresh()
+            } label: {
+                Image(systemName: "arrow.clockwise")
             }
-            .alert("Clear All Data", isPresented: Binding(
-                get: { viewModel.showClearDataAlert },
-                set: { viewModel.showClearDataAlert = $0 }
-            )) {
-                Button("Cancel", role: .cancel) {}
-                Button("Clear All", role: .destructive) { viewModel.clearAllData(items: items) }
-            } message: {
-                Text("This will permanently delete all items. This action cannot be undone.")
+            .help("Refresh app list")
+        }
+
+        ToolbarItem(placement: .primaryAction) {
+            if viewModel.staleAppCount > 0 {
+                Button {
+                    viewModel.prepareCleanup()
+                } label: {
+                    Label("Clean Up", systemImage: "sparkles")
+                }
+                .help("Quit \(viewModel.staleAppCount) stale apps")
             }
-        #endif
+        }
+    }
+
+    private var systemMemoryIndicator: some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(memoryStatusColor)
+                .frame(width: 8, height: 8)
+
+            Text("\(viewModel.systemMemory.formattedUsed) / \(viewModel.systemMemory.formattedTotal)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .help("System memory usage")
+    }
+
+    private var memoryStatusColor: Color {
+        let usage = viewModel.systemMemory.usagePercent
+        if usage > 80 {
+            return .red
+        } else if usage > 60 {
+            return .orange
+        } else {
+            return .green
+        }
+    }
+
+    // MARK: - Tracking
+
+    private func startTracking() {
+        viewModel.startTracking(modelContext: modelContext)
     }
 }
 
 // MARK: - Previews
 
-#Preview("Empty State") {
+#Preview("Main Window") {
     ContentView()
         .modelContainer(.preview)
-}
-
-#Preview("With Data") {
-    ContentView()
-        .modelContainer(.previewWithData)
+        .frame(width: 800, height: 600)
 }
 
 #Preview("Dark Mode") {
     ContentView()
-        .modelContainer(.previewWithData)
+        .modelContainer(.preview)
         .preferredColorScheme(.dark)
+        .frame(width: 800, height: 600)
 }

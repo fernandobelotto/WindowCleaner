@@ -37,6 +37,9 @@ enum Log {
     /// Navigation events: route changes, deep linking, stack operations
     static let navigation = Logger(subsystem: subsystem, category: "navigation")
 
+    /// App tracking: running apps, process monitoring, staleness
+    static let tracking = Logger(subsystem: subsystem, category: "tracking")
+
     /// Factory method for creating category-specific loggers
     /// - Parameter category: The category name for the logger
     /// - Returns: A configured Logger instance

@@ -68,9 +68,9 @@ enum DataError: LocalizedError {
 
 // MARK: - Versioned Schema V1
 
-/// Version 1 of the Item schema.
+/// Version 1 of the schema.
 ///
-/// This is the initial schema version containing the base Item model.
+/// This is the initial schema version containing the base models.
 /// When adding new properties or models, create a new schema version
 /// and add a migration stage to `ItemMigrationPlan`.
 enum ItemSchemaV1: VersionedSchema {
@@ -81,55 +81,37 @@ enum ItemSchemaV1: VersionedSchema {
     }
 }
 
+// MARK: - Versioned Schema V2
+
+/// Version 2 of the schema - adds AppUsageRecord for tracking app usage history.
+enum ItemSchemaV2: VersionedSchema {
+    static var versionIdentifier = Schema.Version(2, 0, 0)
+
+    static var models: [any PersistentModel.Type] {
+        [Item.self, AppUsageRecord.self]
+    }
+}
+
 // MARK: - Migration Plan
 
-/// Migration plan for the Item schema.
+/// Migration plan for the schema.
 ///
 /// This plan manages schema migrations between versions.
 ///
 /// To add a new migration:
-/// 1. Create a new `ItemSchemaV2` (or V3, etc.) with the updated model
+/// 1. Create a new schema version with the updated models
 /// 2. Add the new schema to the `schemas` array
 /// 3. Add a `MigrationStage` to the `stages` array
-///
-/// Example for adding a `title` property:
-/// ```swift
-/// enum ItemSchemaV2: VersionedSchema {
-///     static var versionIdentifier = Schema.Version(2, 0, 0)
-///
-///     @Model
-///     final class Item {
-///         var id: UUID
-///         var timestamp: Date
-///         var title: String  // New property
-///
-///         init(timestamp: Date = Date(), title: String = "") {
-///             self.id = UUID()
-///             self.timestamp = timestamp
-///             self.title = title
-///         }
-///     }
-///
-///     static var models: [any PersistentModel.Type] { [Item.self] }
-/// }
-///
-/// // Then update the migration plan:
-/// static var schemas: [any VersionedSchema.Type] {
-///     [ItemSchemaV1.self, ItemSchemaV2.self]
-/// }
-///
-/// static var stages: [MigrationStage] {
-///     [.lightweight(fromVersion: ItemSchemaV1.self, toVersion: ItemSchemaV2.self)]
-/// }
-/// ```
 enum ItemMigrationPlan: SchemaMigrationPlan {
     static var schemas: [any VersionedSchema.Type] {
-        [ItemSchemaV1.self]
+        [ItemSchemaV1.self, ItemSchemaV2.self]
     }
 
     static var stages: [MigrationStage] {
-        // No migrations needed for V1 (initial version)
-        []
+        [
+            // V1 -> V2: Add AppUsageRecord model (lightweight migration)
+            .lightweight(fromVersion: ItemSchemaV1.self, toVersion: ItemSchemaV2.self),
+        ]
     }
 }
 
@@ -165,7 +147,7 @@ enum DataService {
     /// - Returns: A configured ModelContainer
     /// - Throws: `DataError.containerCreationFailed` if creation fails
     static func makeContainer() throws -> ModelContainer {
-        let schema = Schema(versionedSchema: ItemSchemaV1.self)
+        let schema = Schema(versionedSchema: ItemSchemaV2.self)
 
         // Use in-memory storage during UI testing for clean state
         let isInMemory = Config.isUITesting
@@ -195,7 +177,7 @@ enum DataService {
     ///
     /// - Returns: An in-memory ModelContainer
     static func makePreviewContainer() -> ModelContainer {
-        let schema = Schema(versionedSchema: ItemSchemaV1.self)
+        let schema = Schema(versionedSchema: ItemSchemaV2.self)
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
 
         do {
@@ -204,7 +186,7 @@ enum DataService {
             // In previews, we can fall back to a basic container
             Log.data.error("Failed to create preview container: \(error.localizedDescription)")
             // swiftlint:disable:next force_try
-            return try! ModelContainer(for: Item.self, configurations: config)
+            return try! ModelContainer(for: Item.self, AppUsageRecord.self, configurations: config)
         }
     }
 
