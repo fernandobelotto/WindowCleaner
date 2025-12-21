@@ -26,6 +26,9 @@ struct MenuBarPopover: View {
         }
         .frame(width: 320)
         .background(.background)
+        .sheet(isPresented: $viewModel.showCleanupSelectionSheet) {
+            CleanupSelectionView(viewModel: viewModel)
+        }
     }
 
     // MARK: - Header
@@ -131,16 +134,6 @@ struct MenuBarPopover: View {
         }
         .padding(.horizontal, Metrics.spacingM)
         .padding(.vertical, Metrics.spacingS)
-        .alert("Clean Up Apps?", isPresented: $viewModel.showCleanupConfirmation) {
-            Button("Cancel", role: .cancel) {
-                viewModel.cancelCleanup()
-            }
-            Button("Quit Apps", role: .destructive) {
-                viewModel.executeCleanup()
-            }
-        } message: {
-            Text("This will quit \(viewModel.pendingCleanupApps.count) stale apps, freeing approximately \(viewModel.potentialSavings) of memory.")
-        }
     }
 
     // MARK: - Actions

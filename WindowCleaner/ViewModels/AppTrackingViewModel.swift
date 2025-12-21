@@ -44,6 +44,12 @@ final class AppTrackingViewModel {
     /// Apps pending cleanup (for confirmation)
     var pendingCleanupApps: [TrackedApp] = []
 
+    /// Whether the cleanup selection sheet is shown
+    var showCleanupSelectionSheet: Bool = false
+
+    /// Set of app IDs selected for cleanup
+    var selectedCleanupApps: Set<String> = []
+
     // MARK: - Initialization
 
     @MainActor
@@ -129,6 +135,30 @@ final class AppTrackingViewModel {
         trackingService.activeApp
     }
 
+    // MARK: - Cleanup Selection Computed Properties
+
+    /// Memory that would be freed based on current selection
+    var selectedCleanupMemory: UInt64 {
+        pendingCleanupApps
+            .filter { selectedCleanupApps.contains($0.id) }
+            .reduce(0) { $0 + $1.memoryUsage }
+    }
+
+    /// Formatted memory savings for selected apps
+    var formattedSelectedCleanupMemory: String {
+        ByteCountFormatter.string(fromByteCount: Int64(selectedCleanupMemory), countStyle: .memory)
+    }
+
+    /// Number of selected apps for cleanup
+    var selectedCleanupCount: Int {
+        selectedCleanupApps.count
+    }
+
+    /// Whether all cleanup apps are selected
+    var allCleanupAppsSelected: Bool {
+        !pendingCleanupApps.isEmpty && selectedCleanupApps.count == pendingCleanupApps.count
+    }
+
     // MARK: - Actions
 
     /// Starts tracking apps
@@ -165,7 +195,7 @@ final class AppTrackingViewModel {
         }
     }
 
-    /// Prepares to clean up stale apps (shows confirmation)
+    /// Prepares to clean up stale apps (shows selection sheet)
     func prepareCleanup() {
         pendingCleanupApps = stalenessCalculator.staleApps(from: allApps)
 
@@ -174,27 +204,64 @@ final class AppTrackingViewModel {
             return
         }
 
-        showCleanupConfirmation = true
+        // Pre-select all stale apps by default
+        selectedCleanupApps = Set(pendingCleanupApps.map(\.id))
+        showCleanupSelectionSheet = true
     }
 
-    /// Executes the cleanup of pending apps
+    /// Executes the cleanup of selected apps only
     func executeCleanup() {
-        guard !pendingCleanupApps.isEmpty else { return }
+        let appsToQuit = pendingCleanupApps.filter { selectedCleanupApps.contains($0.id) }
+
+        guard !appsToQuit.isEmpty else {
+            cancelCleanup()
+            return
+        }
 
         isCleaningUp = true
 
-        let count = trackingService.quitApps(pendingCleanupApps)
+        let count = trackingService.quitApps(appsToQuit)
         Log.tracking.info("Cleaned up \(count) apps")
 
         pendingCleanupApps = []
+        selectedCleanupApps = []
         isCleaningUp = false
+        showCleanupSelectionSheet = false
         showCleanupConfirmation = false
     }
 
     /// Cancels the pending cleanup
     func cancelCleanup() {
         pendingCleanupApps = []
+        selectedCleanupApps = []
+        showCleanupSelectionSheet = false
         showCleanupConfirmation = false
+    }
+
+    // MARK: - Cleanup Selection Actions
+
+    /// Toggles selection for a single app
+    func toggleCleanupSelection(for app: TrackedApp) {
+        if selectedCleanupApps.contains(app.id) {
+            selectedCleanupApps.remove(app.id)
+        } else {
+            selectedCleanupApps.insert(app.id)
+        }
+    }
+
+    /// Checks if an app is selected for cleanup
+    func isSelectedForCleanup(_ app: TrackedApp) -> Bool {
+        selectedCleanupApps.contains(app.id)
+    }
+
+    /// Selects all apps for cleanup
+    func selectAllForCleanup() {
+        selectedCleanupApps = Set(pendingCleanupApps.map(\.id))
+    }
+
+    /// Deselects all apps for cleanup
+    func selectNoneForCleanup() {
+        selectedCleanupApps.removeAll()
     }
 
     /// Toggles protection status for an app

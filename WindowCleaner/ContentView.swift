@@ -66,15 +66,8 @@ struct ContentView: View {
                 Text(error)
             }
         }
-        .alert("Clean Up Apps?", isPresented: $viewModel.showCleanupConfirmation) {
-            Button("Cancel", role: .cancel) {
-                viewModel.cancelCleanup()
-            }
-            Button("Quit Apps", role: .destructive) {
-                viewModel.executeCleanup()
-            }
-        } message: {
-            Text("This will quit \(viewModel.pendingCleanupApps.count) stale apps, freeing approximately \(viewModel.potentialSavings) of memory.")
+        .sheet(isPresented: $viewModel.showCleanupSelectionSheet) {
+            CleanupSelectionView(viewModel: viewModel)
         }
         // Handle menu commands
         .onReceive(NotificationCenter.default.publisher(for: .refreshContent)) { _ in
