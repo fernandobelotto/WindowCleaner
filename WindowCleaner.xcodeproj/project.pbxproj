@@ -6,6 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		264D3A07EDE6D54CBB18FED6 /* PrivateUpdateTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB738BBEB41821407787B5BF /* PrivateUpdateTransport.swift */; };
+		2A22608750F63AD8853D69A5 /* UpdateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D5FB43DE4B58E2ECC0363A7 /* UpdateTests.swift */; };
+		2CA02DE45B8F82EBAC0CD732 /* PrivateUpdateAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7535ABD1380100920A5B10F2 /* PrivateUpdateAccess.swift */; };
+		3A3EB789F4E12CB87CCB2A28 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9512BD4F5BA249BF4F56EDBB /* Sparkle */; };
+		A00C8C5249AE925BB8735793 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9512BD4F5BA249BF4F56EDBB /* Sparkle */; };
+		D973BE7F5E0ADE2495961A04 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48142974370E27279982B9C5 /* Cocoa.framework */; };
+		E98A6343580577450759DF19 /* UpdateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AA5FBCB65BA7B2A26F6F83A /* UpdateController.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		84B242B52EDB440900177559 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,34 +34,82 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		48142974370E27279982B9C5 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		5D5FB43DE4B58E2ECC0363A7 /* UpdateTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UpdateTests.swift; path = WindowCleanerTests/UpdateTests.swift; sourceTree = "<group>"; };
+		6AA5FBCB65BA7B2A26F6F83A /* UpdateController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UpdateController.swift; path = WindowCleaner/Updates/UpdateController.swift; sourceTree = "<group>"; };
+		7535ABD1380100920A5B10F2 /* PrivateUpdateAccess.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PrivateUpdateAccess.swift; path = WindowCleaner/Updates/PrivateUpdateAccess.swift; sourceTree = "<group>"; };
 		84B242A52EDB440800177559 /* WindowCleaner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WindowCleaner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84B242B42EDB440900177559 /* WindowCleanerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WindowCleanerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		84B242BE2EDB440900177559 /* WindowCleanerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WindowCleanerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB738BBEB41821407787B5BF /* PrivateUpdateTransport.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PrivateUpdateTransport.swift; path = WindowCleaner/Updates/PrivateUpdateTransport.swift; sourceTree = "<group>"; };
+		ECE316D77F92EC4C1A85C953 /* WindowCleanerUpdateTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WindowCleanerUpdateTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC867191A76D6D253F7D41D8 /* WindowCleanerAppStore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WindowCleanerAppStore.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		89C73A5F093A6BAC63B44499 /* Exceptions for "WindowCleaner" folder in "WindowCleanerAppStore" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				"Info-AppStore.plist",
+				WindowCleaner.entitlements,
+				WindowCleanerAppStore.entitlements,
+			);
+			target = D4C71A935362E0DD93E24372 /* WindowCleanerAppStore */;
+		};
+		B7DE754C843A42B863D54C1B /* Exceptions for "WindowCleaner" folder in "WindowCleaner" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				"Info-AppStore.plist",
+				WindowCleaner.entitlements,
+				WindowCleanerAppStore.entitlements,
+			);
+			target = 84B242A42EDB440800177559 /* WindowCleaner */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		84B242A72EDB440800177559 /* WindowCleaner */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B7DE754C843A42B863D54C1B /* Exceptions for "WindowCleaner" folder in "WindowCleaner" target */,
+				89C73A5F093A6BAC63B44499 /* Exceptions for "WindowCleaner" folder in "WindowCleanerAppStore" target */,
+			);
 			path = WindowCleaner;
 			sourceTree = "<group>";
 		};
 		84B242B72EDB440900177559 /* WindowCleanerTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = WindowCleanerTests;
 			sourceTree = "<group>";
 		};
 		84B242C12EDB440900177559 /* WindowCleanerUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = WindowCleanerUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		1A86517224B844D2F96A249C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D973BE7F5E0ADE2495961A04 /* Cocoa.framework in Frameworks */,
+				A00C8C5249AE925BB8735793 /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		84B242A22EDB440800177559 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A3EB789F4E12CB87CCB2A28 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,9 +127,32 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D48502D7A90675F118A0C1E5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2EF724BFB44BC08A30016355 /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				48142974370E27279982B9C5 /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		30D8BB2356A991701D36968A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2EF724BFB44BC08A30016355 /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		84B2429C2EDB440800177559 = {
 			isa = PBXGroup;
 			children = (
@@ -79,6 +160,11 @@
 				84B242B72EDB440900177559 /* WindowCleanerTests */,
 				84B242C12EDB440900177559 /* WindowCleanerUITests */,
 				84B242A62EDB440800177559 /* Products */,
+				30D8BB2356A991701D36968A /* Frameworks */,
+				5D5FB43DE4B58E2ECC0363A7 /* UpdateTests.swift */,
+				6AA5FBCB65BA7B2A26F6F83A /* UpdateController.swift */,
+				7535ABD1380100920A5B10F2 /* PrivateUpdateAccess.swift */,
+				EB738BBEB41821407787B5BF /* PrivateUpdateTransport.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -88,6 +174,8 @@
 				84B242A52EDB440800177559 /* WindowCleaner.app */,
 				84B242B42EDB440900177559 /* WindowCleanerTests.xctest */,
 				84B242BE2EDB440900177559 /* WindowCleanerUITests.xctest */,
+				FC867191A76D6D253F7D41D8 /* WindowCleanerAppStore.app */,
+				ECE316D77F92EC4C1A85C953 /* WindowCleanerUpdateTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -113,6 +201,7 @@
 			);
 			name = WindowCleaner;
 			packageProductDependencies = (
+				9512BD4F5BA249BF4F56EDBB /* Sparkle */,
 			);
 			productName = WindowCleaner;
 			productReference = 84B242A52EDB440800177559 /* WindowCleaner.app */;
@@ -135,8 +224,6 @@
 				84B242B72EDB440900177559 /* WindowCleanerTests */,
 			);
 			name = WindowCleanerTests;
-			packageProductDependencies = (
-			);
 			productName = WindowCleanerTests;
 			productReference = 84B242B42EDB440900177559 /* WindowCleanerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -158,11 +245,49 @@
 				84B242C12EDB440900177559 /* WindowCleanerUITests */,
 			);
 			name = WindowCleanerUITests;
-			packageProductDependencies = (
-			);
 			productName = WindowCleanerUITests;
 			productReference = 84B242BE2EDB440900177559 /* WindowCleanerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		9987FE75A09EEDF8683FD657 /* WindowCleanerUpdateTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 568BE32C5015B44366FA9AEF /* Build configuration list for PBXNativeTarget "WindowCleanerUpdateTests" */;
+			buildPhases = (
+				E8F6053DEA11352AD4F6D279 /* Sources */,
+				1A86517224B844D2F96A249C /* Frameworks */,
+				2112D8D3783BD9E0F9B142A6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WindowCleanerUpdateTests;
+			packageProductDependencies = (
+				9512BD4F5BA249BF4F56EDBB /* Sparkle */,
+			);
+			productName = WindowCleanerUpdateTests;
+			productReference = ECE316D77F92EC4C1A85C953 /* WindowCleanerUpdateTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D4C71A935362E0DD93E24372 /* WindowCleanerAppStore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3F995E0DE5228D7E3F460FE8 /* Build configuration list for PBXNativeTarget "WindowCleanerAppStore" */;
+			buildPhases = (
+				00E0BBE459DE539D336302BC /* Sources */,
+				D48502D7A90675F118A0C1E5 /* Frameworks */,
+				4B744B18AFA24DEA67DC1728 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				84B242A72EDB440800177559 /* WindowCleaner */,
+			);
+			name = WindowCleanerAppStore;
+			productName = WindowCleanerAppStore;
+			productReference = FC867191A76D6D253F7D41D8 /* WindowCleanerAppStore.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -198,6 +323,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				84B242D12EDB49C000177559 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				4045DB1F821A96BCD7A063BA /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 84B242A62EDB440800177559 /* Products */;
@@ -207,11 +333,27 @@
 				84B242A42EDB440800177559 /* WindowCleaner */,
 				84B242B32EDB440900177559 /* WindowCleanerTests */,
 				84B242BD2EDB440900177559 /* WindowCleanerUITests */,
+				D4C71A935362E0DD93E24372 /* WindowCleanerAppStore */,
+				9987FE75A09EEDF8683FD657 /* WindowCleanerUpdateTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2112D8D3783BD9E0F9B142A6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B744B18AFA24DEA67DC1728 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		84B242A32EDB440800177559 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -236,6 +378,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		00E0BBE459DE539D336302BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		84B242A12EDB440800177559 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -257,6 +406,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8F6053DEA11352AD4F6D279 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2A22608750F63AD8853D69A5 /* UpdateTests.swift in Sources */,
+				E98A6343580577450759DF19 /* UpdateController.swift in Sources */,
+				2CA02DE45B8F82EBAC0CD732 /* PrivateUpdateAccess.swift in Sources */,
+				264D3A07EDE6D54CBB18FED6 /* PrivateUpdateTransport.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -272,11 +432,37 @@
 		};
 		84B242D32EDB49F700177559 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = 84B242D22EDB49F700177559 /* SwiftLintBuildToolPlugin */;
+			productRef = 84B242D22EDB49F700177559 /* plugin:SwiftLintBuildToolPlugin */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		03C30533551946943D827B13 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J37G76B69X;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/../Frameworks",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fernandobelotto.WindowCleaner.updatetests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) UPDATER_TEST_HARNESS";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
 		84B242C62EDB440900177559 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -402,6 +588,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WindowCleaner/WindowCleaner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -411,6 +598,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = WindowCleaner/Info.plist;
+				INFOPLIST_KEY_SUAutomaticallyUpdate = NO;
+				INFOPLIST_KEY_SUEnableAutomaticChecks = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -433,6 +622,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WindowCleaner/WindowCleaner.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -442,6 +632,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = WindowCleaner/Info.plist;
+				INFOPLIST_KEY_SUAutomaticallyUpdate = NO;
+				INFOPLIST_KEY_SUEnableAutomaticChecks = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -539,9 +731,119 @@
 			};
 			name = Release;
 		};
+		A9C4139BD01D5C4396D44940 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WindowCleaner/WindowCleanerAppStore.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J37G76B69X;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "WindowCleaner/Info-AppStore.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fernandobelotto.WindowCleaner;
+				PRODUCT_NAME = WindowCleaner;
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APP_STORE";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		BCDB97009070F3D6E3DF6E0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J37G76B69X;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/../Frameworks",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fernandobelotto.WindowCleaner.updatetests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) UPDATER_TEST_HARNESS";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		E9836C07336CD4BA405A46C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = WindowCleaner/WindowCleanerAppStore.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J37G76B69X;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "WindowCleaner/Info-AppStore.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fernandobelotto.WindowCleaner;
+				PRODUCT_NAME = WindowCleaner;
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) APP_STORE";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3F995E0DE5228D7E3F460FE8 /* Build configuration list for PBXNativeTarget "WindowCleanerAppStore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E9836C07336CD4BA405A46C3 /* Release */,
+				A9C4139BD01D5C4396D44940 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		568BE32C5015B44366FA9AEF /* Build configuration list for PBXNativeTarget "WindowCleanerUpdateTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BCDB97009070F3D6E3DF6E0E /* Release */,
+				03C30533551946943D827B13 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		84B242A02EDB440800177559 /* Build configuration list for PBXProject "WindowCleaner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -581,6 +883,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		4045DB1F821A96BCD7A063BA /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.10.0;
+			};
+		};
 		84B242D12EDB49C000177559 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
@@ -592,10 +902,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		84B242D22EDB49F700177559 /* SwiftLintBuildToolPlugin */ = {
+		84B242D22EDB49F700177559 /* plugin:SwiftLintBuildToolPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 84B242D12EDB49C000177559 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		9512BD4F5BA249BF4F56EDBB /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4045DB1F821A96BCD7A063BA /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

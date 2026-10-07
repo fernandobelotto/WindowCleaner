@@ -9,6 +9,9 @@ import UserNotifications
 struct SettingsView: View {
     var body: some View {
         TabView {
+            #if !APP_STORE
+            PrivateUpdateSettings().tabItem { Label("Updates", systemImage: "arrow.triangle.2.circlepath") }
+            #endif
             GeneralSettingsTab()
                 .tabItem {
                     Label("General", systemImage: "gear")

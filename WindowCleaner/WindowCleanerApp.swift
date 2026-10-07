@@ -29,12 +29,20 @@ struct WindowCleanerApp: App {
         // Main Window
         WindowGroup {
             MainContentView()
+                .task {
+                    #if !APP_STORE
+                    UpdateController.shared.restartGuard = { !StoreManager.shared.isLoading && !sharedModelContainer.mainContext.hasChanges }
+                    #endif
+                }
                 .frame(minWidth: 700, minHeight: 500)
                 .environment(storeManager)
         }
         .modelContainer(sharedModelContainer)
         .commands {
             appCommands
+            #if !APP_STORE
+            UpdateCommands()
+            #endif
         }
 
         // Menu Bar Extra

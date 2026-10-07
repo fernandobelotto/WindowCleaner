@@ -1,0 +1,28 @@
+name: Updater checks
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  updater:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate metadata, loopback transport and credential redirects
+        run: Scripts/test-update-transport.sh
+      - name: Test updater preferences and safe installation
+        run: xcodebuild -project WindowCleaner.xcodeproj -scheme WindowCleanerUpdates -destination 'platform=macOS' -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO test
+      - name: Build Store variant without self-updater
+        run: xcodebuild -project WindowCleaner.xcodeproj -scheme WindowCleanerAppStore -configuration Release -derivedDataPath .build/updater-store -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO build
+      - name: Verify Store has no Sparkle linkage or framework
+        run: |
+          python3 - <<'PY'
+          import pathlib, plistlib, subprocess
+          bundle = pathlib.Path('.build/updater-store/Build/Products/Release/WindowCleaner.app')
+          assert not (bundle / 'Contents/Frameworks/Sparkle.framework').exists()
+          assert 'Sparkle' not in subprocess.check_output(['otool', '-L', str(bundle / 'Contents/MacOS/WindowCleaner')], text=True)
+          info = plistlib.loads((bundle / 'Contents/Info.plist').read_bytes())
+          assert not any(key.startswith('SU') for key in info)
+          PY
