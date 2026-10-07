@@ -1,0 +1,59 @@
+name: Prepare signed update
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Stable version for this approved release (for example 1.0.0)
+        required: true
+        type: string
+      publish:
+        description: Publish only after signed notarized bytes and complete metadata verify
+        default: false
+        type: boolean
+permissions:
+  contents: read
+concurrency:
+  group: WindowCleaner-signed-updates
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: github.repository == 'fernandobelotto/WindowCleaner' && github.ref == 'refs/heads/main'
+    runs-on: macos-26
+    environment: release
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SIGNING_IDENTITY: ${{ vars.SIGNING_IDENTITY }}
+      DEVELOPER_ID_P12_BASE64: ${{ secrets.DEVELOPER_ID_P12_BASE64 }}
+      DEVELOPER_ID_P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+      NOTARY_PRIVATE_KEY: ${{ secrets.NOTARY_PRIVATE_KEY }}
+      NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+      NOTARY_ISSUER: ${{ secrets.NOTARY_ISSUER }}
+      SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+      RELEASE_VERSION: ${{ inputs.version }}
+      RELEASE_BUILD: ${{ github.run_number }}
+      RELEASE_PUBLISH: ${{ inputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Use OpenSSL 3 for Ed25519 verification
+        shell: bash
+        run: |
+          brew list --versions openssl@3 >/dev/null || brew install openssl@3
+          echo "$(brew --prefix openssl@3)/bin" >> "$GITHUB_PATH"
+      - name: Verify release policy and signature fixtures
+        run: python3 -m unittest discover -s Scripts -p 'test_*release*.py' -v
+      - name: Build, sign, notarize and prepare immutable update
+        shell: bash
+        run: |
+          args=(--version "$RELEASE_VERSION" --build "$RELEASE_BUILD")
+          if [[ "$RELEASE_PUBLISH" == true ]]; then args+=(--publish); fi
+          python3 Scripts/release-updates.py "${args[@]}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signed-update-${{ inputs.version }}
+          path: dist/
+          if-no-files-found: error
