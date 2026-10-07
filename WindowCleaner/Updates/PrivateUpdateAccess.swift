@@ -50,7 +50,9 @@
             request[kSecUseAuthenticationContext as String] = context
             var result: CFTypeRef?
             let status = SecItemCopyMatching(request as CFDictionary, &result)
-            if status == errSecItemNotFound { return nil }
+            if status == errSecItemNotFound {
+                return nil
+            }
             guard status == errSecSuccess else { throw PrivateUpdateAccess.AccessError.keychain(status) }
             guard let data = result as? Data, let token = String(data: data, encoding: .utf8),
                   PrivateUpdateAccess.validToken(token) else { throw PrivateUpdateAccess.AccessError.invalidToken }

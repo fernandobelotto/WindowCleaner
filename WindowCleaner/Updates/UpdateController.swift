@@ -98,7 +98,11 @@
                         controller = next
                     }
                     cycleActive = true
-                    if userInitiated { controller?.checkForUpdates(nil) } else { controller?.updater.checkForUpdatesInBackground() }
+                    if userInitiated {
+                        controller?.checkForUpdates(nil)
+                    } else {
+                        controller?.updater.checkForUpdatesInBackground()
+                    }
                 } catch {
                     status = error.localizedDescription
                     if userInitiated {
@@ -130,8 +134,14 @@
             } catch { status = error.localizedDescription }
         }
 
-        func feedURLString(for _: SPUUpdater) -> String? { transport.feedURL?.absoluteString }
-        func updater(_: SPUUpdater, shouldDownloadReleaseNotesForUpdate _: SUAppcastItem) -> Bool { false }
+        func feedURLString(for _: SPUUpdater) -> String? {
+            transport.feedURL?.absoluteString
+        }
+
+        func updater(_: SPUUpdater, shouldDownloadReleaseNotesForUpdate _: SUAppcastItem) -> Bool {
+            false
+        }
+
         func updater(_: SPUUpdater, willDownloadUpdate _: SUAppcastItem, with request: NSMutableURLRequest) {
             guard request.url == transport.sourceArchiveURL, let destination = transport.archiveURL else {
                 request.url = URL(string: "http://127.0.0.1:1/rejected-update")
@@ -144,7 +154,9 @@
 
         func updater(_: SPUUpdater, didFinishUpdateCycleFor _: SPUUpdateCheck, error: (any Error)?) {
             cycleActive = false
-            if status == nil { status = error?.localizedDescription }
+            if status == nil {
+                status = error?.localizedDescription
+            }
         }
 
         func updater(
@@ -201,7 +213,9 @@
                     if updater.hasPendingInstall {
                         Button("Install Downloaded Update…") { updater.installDownloadedUpdate() }
                     }
-                    if let status = updater.status { Text(status).font(.caption).foregroundStyle(.secondary) }
+                    if let status = updater.status {
+                        Text(status).font(.caption).foregroundStyle(.secondary)
+                    }
                 }
             }.padding()
         }
@@ -216,7 +230,9 @@
             CommandGroup(after: .appInfo) {
                 Button("Check for Updates…") { updater.checkForUpdates() }.disabled(!updater.canCheckForUpdates)
                 if updater
-                    .hasPendingInstall { Button("Install Downloaded Update…") { updater.installDownloadedUpdate() } }
+                    .hasPendingInstall {
+                    Button("Install Downloaded Update…") { updater.installDownloadedUpdate() }
+                }
             }
         }
     }

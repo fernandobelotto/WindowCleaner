@@ -6,7 +6,10 @@
     /// Reject redirects outside GitHub's credential-free artifact delivery hosts.
     final class UpdateRedirectPolicy: NSObject, URLSessionDownloadDelegate, Sendable {
         let maximum: Int64
-        init(maximum: Int64 = 512 * 1024 * 1024) { self.maximum = maximum }
+        init(maximum: Int64 = 512 * 1024 * 1024) {
+            self.maximum = maximum
+        }
+
         func urlSession(
             _: URLSession,
             downloadTask: URLSessionDownloadTask,
@@ -14,7 +17,9 @@
             totalBytesWritten: Int64,
             totalBytesExpectedToWrite: Int64
         ) {
-            if totalBytesWritten > maximum || totalBytesExpectedToWrite > maximum { downloadTask.cancel() }
+            if totalBytesWritten > maximum || totalBytesExpectedToWrite > maximum {
+                downloadTask.cancel()
+            }
         }
 
         func urlSession(_: URLSession, downloadTask _: URLSessionDownloadTask, didFinishDownloadingTo _: URL) {}
@@ -85,7 +90,9 @@
             qualifiedName _: String?,
             attributes attributeDict: [String: String]
         ) {
-            if elementName == "enclosure" { enclosures.append(attributeDict) }
+            if elementName == "enclosure" {
+                enclosures.append(attributeDict)
+            }
             if elementName.hasSuffix("releaseNotesLink") || elementName.hasSuffix("fullReleaseNotesLink") {
                 invalid = true
             }
@@ -174,7 +181,9 @@
             guard let url = URL(string: "https://api.github.com/repos/" + repository + "/" + path)
             else { throw Failure.unexpectedResponse }
             var request = URLRequest(url: url)
-            if let token { request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization") }
+            if let token {
+                request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+            }
             request.setValue(
                 binary ? "application/octet-stream" : "application/vnd.github+json",
                 forHTTPHeaderField: "Accept"
@@ -182,7 +191,9 @@
             request.setValue("2022-11-28", forHTTPHeaderField: "X-GitHub-Api-Version")
             let (data, response) = try await session.data(for: request)
             guard let response = response as? HTTPURLResponse else { throw Failure.unexpectedResponse }
-            if [401, 403, 404].contains(response.statusCode) { throw Failure.access }
+            if [401, 403, 404].contains(response.statusCode) {
+                throw Failure.access
+            }
             guard response.statusCode == 200, data.count <= maximum else { throw Failure.unexpectedResponse }
             return data
         }
@@ -214,7 +225,9 @@
             listener?.cancel()
             nonce = UUID().uuidString
             feed = nextFeed
-            if let archiveFile { try? FileManager.default.removeItem(at: archiveFile) }
+            if let archiveFile {
+                try? FileManager.default.removeItem(at: archiveFile)
+            }
             archiveFile = nil
             archiveAsset = asset
             sourceArchiveURL = source
@@ -236,7 +249,11 @@
                         switch state {
                         case .ready:
                             self.bridgeContinuation = nil
-                            if let port = bridge.port { pending.resume(returning: port) } else { pending.resume(throwing: Failure.bridge) }
+                            if let port = bridge.port {
+                                pending.resume(returning: port)
+                            } else {
+                                pending.resume(throwing: Failure.bridge)
+                            }
                         case .failed, .cancelled:
                             self.bridgeContinuation = nil
                             pending.resume(throwing: Failure.bridge)
@@ -289,7 +306,8 @@
                         let path = String(pieces[1])
                         let body: Data
                         let type: String
-                        if path == self.feedURL?.path { body = self.feed
+                        if path == self.feedURL?.path {
+                            body = self.feed
                             type = "application/xml"
                         } else if path == self.archiveURL?.path {
                             do { try await self.sendArchive(connection) } catch {
@@ -303,7 +321,8 @@
                                 )
                             }
                             return
-                        } else { connection.cancel()
+                        } else {
+                            connection.cancel()
                             return
                         }
                         let responseHeader = Data(
@@ -327,7 +346,9 @@
                     URL(string: "https://api.github.com/repos/" + repository + "/releases/assets/" + String(asset.id))
                 else { throw Failure.unexpectedResponse }
                 var request = URLRequest(url: url)
-                if let token { request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization") }
+                if let token {
+                    request.setValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+                }
                 request.setValue("application/octet-stream", forHTTPHeaderField: "Accept")
                 request.setValue("2022-11-28", forHTTPHeaderField: "X-GitHub-Api-Version")
                 guard let config = sessionConfiguration.copy() as? URLSessionConfiguration else { throw Failure.bridge }
@@ -377,7 +398,11 @@
         private func send(_ data: Data, to connection: NWConnection) async throws {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
                 connection.send(content: data, completion: .contentProcessed { error in
-                    if let error { continuation.resume(throwing: error) } else { continuation.resume() }
+                    if let error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume()
+                    }
                 })
             }
         }

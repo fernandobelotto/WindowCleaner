@@ -9,8 +9,13 @@
     struct UpdateTests {
         final class Tokens: UpdateTokenStore {
             var value: String?
-            func readToken() throws -> String? { value }
-            func saveToken(_ token: String) throws { value = token }
+            func readToken() throws -> String? {
+                value
+            }
+
+            func saveToken(_ token: String) throws {
+                value = token
+            }
         }
 
         @Test

@@ -31,7 +31,9 @@ struct WindowCleanerApp: App {
             MainContentView()
                 .task {
                     #if !APP_STORE
-                    UpdateController.shared.restartGuard = { !StoreManager.shared.isLoading && !sharedModelContainer.mainContext.hasChanges }
+                        UpdateController.shared.restartGuard = {
+                            !StoreManager.shared.isLoading && !sharedModelContainer.mainContext.hasChanges
+                        }
                     #endif
                 }
                 .frame(minWidth: 700, minHeight: 500)
@@ -41,7 +43,7 @@ struct WindowCleanerApp: App {
         .commands {
             appCommands
             #if !APP_STORE
-            UpdateCommands()
+                UpdateCommands()
             #endif
         }
 

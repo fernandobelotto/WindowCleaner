@@ -112,8 +112,14 @@ final class FixtureUpdateProtocol: URLProtocol, @unchecked Sendable {
     static let responses = Mutex<[String: Data]>([:])
     static let paths = Mutex<[String]>([])
     static let statuses = Mutex<[String: Int]>([:])
-    override class func canInit(with request: URLRequest) -> Bool { request.url?.host == "api.github.com" }
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override class func canInit(with request: URLRequest) -> Bool {
+        request.url?.host == "api.github.com"
+    }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
     override func startLoading() {
         precondition(request.value(forHTTPHeaderField: "Authorization") == nil, "Public updates must not need a token")
         let path = request.url!.path
