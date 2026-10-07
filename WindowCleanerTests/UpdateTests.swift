@@ -67,7 +67,12 @@
 
         @Test
         func incompleteDraftAndPrereleaseArtifactsAreIgnored() throws {
-            let json = #"[{"id":1,"tag_name":"v1.0.0","draft":false,"prerelease":false,"assets":[{"id":2,"name":"appcast.xml","size":100,"state":"uploaded"},{"id":3,"name":"release.json","size":100,"state":"uploaded"},{"id":4,"name":"WindowCleaner-1.0.0-universal.zip","size":100,"state":"uploaded"}]}]"#
+            let json = #"""
+            [{"id":1,"tag_name":"v1.0.0","draft":false,"prerelease":false,
+            "assets":[{"id":2,"name":"appcast.xml","size":100,"state":"uploaded"},
+            {"id":3,"name":"release.json","size":100,"state":"uploaded"},
+            {"id":4,"name":"WindowCleaner-1.0.0-universal.zip","size":100,"state":"uploaded"}]}]
+            """#
             let release = try JSONDecoder().decode([PrivateUpdateRelease].self, from: Data(json.utf8))[0]
             #expect(release.completeArchive(app: "WindowCleaner")?.id == 4)
             for value in ["draft", "prerelease"] {

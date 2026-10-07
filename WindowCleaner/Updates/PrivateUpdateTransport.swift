@@ -314,8 +314,8 @@
                                 self.failureHandler?(error)
                                 connection.send(
                                     content: Data(
-                                        "HTTP/1.1 503 Service Unavailable\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
-                                            .utf8
+                                        ("HTTP/1.1 503 Service Unavailable\r\n"
+                                            + "Content-Length: 0\r\nConnection: close\r\n\r\n").utf8
                                     ),
                                     completion: .contentProcessed { _ in connection.cancel() }
                                 )

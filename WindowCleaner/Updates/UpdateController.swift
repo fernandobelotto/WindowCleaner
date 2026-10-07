@@ -182,7 +182,8 @@
             }
             let alert = NSAlert()
             alert.messageText = "Restart to Install Update?"
-            alert.informativeText = "Finish active operations and save your work before restarting. You can install later."
+            alert.informativeText = "Finish active operations and save your work before restarting. "
+                + "You can install later."
             alert.addButton(withTitle: "Restart Now")
             alert.addButton(withTitle: "Later")
             guard alert.runModal() == .alertFirstButtonReturn else { return }
