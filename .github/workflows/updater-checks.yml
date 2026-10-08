@@ -4,12 +4,28 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+# This public repository uses a personal, persistent runner. Only the owner can
+# trigger these jobs, and PRs must originate from this same repository. Fork and
+# external-contributor PRs cannot use this runner; review/import trusted changes
+# into an owner-authored repository branch before requesting required CI.
 jobs:
   updater:
-    runs-on: macos-latest
+    if: github.repository == 'fernandobelotto/WindowCleaner' && github.repository_owner == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.user.login == 'fernandobelotto')
+    runs-on: [self-hosted, macOS, ARM64, ci-build, windowcleaner-build]
     timeout-minutes: 30
+    defaults:
+      run:
+        shell: /opt/homebrew/bin/python3 /Users/fernando/ci-tools/serial-shell.py {0}
+    env:
+      DEVELOPER_DIR: /Users/fernando/ci-tools/Xcode.app/Contents/Developer
     steps:
+      - name: Use provisioned build tools
+        run: |
+          echo /opt/homebrew/bin >> "$GITHUB_PATH"
+          test -x "$DEVELOPER_DIR/usr/bin/xcodebuild"
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Validate metadata, loopback transport and credential redirects
         run: Scripts/test-update-transport.sh
       - name: Test updater preferences and safe installation

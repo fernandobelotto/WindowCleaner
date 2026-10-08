@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   prepare:
-    if: github.repository == 'fernandobelotto/WindowCleaner' && github.ref == 'refs/heads/main'
+    if: (github.repository == 'fernandobelotto/WindowCleaner' && github.ref == 'refs/heads/main') && (github.repository == 'fernandobelotto/WindowCleaner' && github.repository_owner == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.user.login == 'fernandobelotto')) && github.actor == 'fernandobelotto'
     runs-on: macos-26
     environment: release
     timeout-minutes: 90
