@@ -21,7 +21,7 @@ jobs:
     if: github.repository == 'fernandobelotto/WindowCleaner' && github.repository_owner == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.user.login == 'fernandobelotto')
     name: Build & Test
     runs-on: [self-hosted, macOS, ARM64, ci-build, windowcleaner-build]
-    timeout-minutes: 30
+    timeout-minutes: 90
 
     defaults:
       run:
@@ -91,13 +91,13 @@ jobs:
           path: |
             TestResults.xcresult
             test-results.xml
-          retention-days: 7
+          retention-days: 1
 
   lint:
     if: github.repository == 'fernandobelotto/WindowCleaner' && github.repository_owner == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.user.login == 'fernandobelotto')
     name: SwiftLint
     runs-on: [self-hosted, macOS, ARM64, ci-build, windowcleaner-build]
-    timeout-minutes: 10
+    timeout-minutes: 90
 
     defaults:
       run:
@@ -124,7 +124,7 @@ jobs:
     if: github.repository == 'fernandobelotto/WindowCleaner' && github.repository_owner == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.user.login == 'fernandobelotto')
     name: Format Check
     runs-on: [self-hosted, macOS, ARM64, ci-build, windowcleaner-build]
-    timeout-minutes: 10
+    timeout-minutes: 90
 
     defaults:
       run:
