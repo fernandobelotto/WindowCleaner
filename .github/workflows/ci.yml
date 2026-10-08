@@ -10,33 +10,49 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+# This public repository uses a personal, persistent runner. Only the owner can
+# trigger these jobs, and PRs must originate from this same repository. Fork and
+# external-contributor PRs cannot use this runner; review/import trusted changes
+# into an owner-authored repository branch before requesting required CI.
 jobs:
   build-and-test:
+    if: github.repository == 'fernandobelotto/WindowCleaner' && github.repository_owner == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.user.login == 'fernandobelotto')
     name: Build & Test
-    runs-on: macos-15
-    timeout-minutes: 30
+    runs-on: [self-hosted, macOS, ARM64, ci-build, windowcleaner-build]
+    timeout-minutes: 90
 
+    defaults:
+      run:
+        shell: /opt/homebrew/bin/python3 /Users/fernando/ci-tools/serial-shell.py {0}
+    env:
+      DEVELOPER_DIR: /Users/fernando/ci-tools/Xcode.app/Contents/Developer
     steps:
+      - name: Use provisioned build tools
+        run: |
+          echo /opt/homebrew/bin >> "$GITHUB_PATH"
+          test -x "$DEVELOPER_DIR/usr/bin/xcodebuild"
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-      - name: Select Xcode
+      - name: Verify provisioned Xcode
         run: |
-          # Use the latest stable Xcode available on the runner
-          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
           xcodebuild -version
           swift --version
 
       - name: Cache DerivedData
         uses: actions/cache@v4
         with:
-          path: ~/Library/Developer/Xcode/DerivedData
-          key: ${{ runner.os }}-deriveddata-${{ hashFiles('**/*.swift', '**/project.pbxproj') }}
+          path: ${{ runner.temp }}/WindowCleaner-DerivedData
+          key: ${{ runner.os }}-windowcleaner-deriveddata-${{ hashFiles('**/*.swift', '**/project.pbxproj') }}
           restore-keys: |
-            ${{ runner.os }}-deriveddata-
+            ${{ runner.os }}-windowcleaner-deriveddata-
 
-      - name: Install xcpretty
-        run: gem install xcpretty
+      - name: Verify provisioned xcpretty
+        run: command -v xcpretty
 
       - name: Build
         run: |
@@ -46,6 +62,7 @@ jobs:
             -scheme WindowCleaner \
             -destination "platform=macOS" \
             -configuration Debug \
+            -derivedDataPath "$RUNNER_TEMP/WindowCleaner-DerivedData" \
             -skipPackagePluginValidation \
             -skipMacroValidation \
             CODE_SIGNING_ALLOWED=NO \
@@ -59,6 +76,7 @@ jobs:
             -scheme WindowCleaner \
             -destination "platform=macOS" \
             -configuration Debug \
+            -derivedDataPath "$RUNNER_TEMP/WindowCleaner-DerivedData" \
             -skipPackagePluginValidation \
             -skipMacroValidation \
             CODE_SIGNING_ALLOWED=NO \
@@ -73,34 +91,58 @@ jobs:
           path: |
             TestResults.xcresult
             test-results.xml
-          retention-days: 7
+          retention-days: 1
 
   lint:
+    if: github.repository == 'fernandobelotto/WindowCleaner' && github.repository_owner == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.user.login == 'fernandobelotto')
     name: SwiftLint
-    runs-on: macos-15
-    timeout-minutes: 10
+    runs-on: [self-hosted, macOS, ARM64, ci-build, windowcleaner-build]
+    timeout-minutes: 90
 
+    defaults:
+      run:
+        shell: /opt/homebrew/bin/python3 /Users/fernando/ci-tools/serial-shell.py {0}
+    env:
+      DEVELOPER_DIR: /Users/fernando/ci-tools/Xcode.app/Contents/Developer
     steps:
+      - name: Use provisioned build tools
+        run: |
+          echo /opt/homebrew/bin >> "$GITHUB_PATH"
+          test -x "$DEVELOPER_DIR/usr/bin/xcodebuild"
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-      - name: Install SwiftLint
-        run: brew install swiftlint
+      - name: Verify provisioned SwiftLint
+        run: swiftlint version
 
       - name: Run SwiftLint
         run: swiftlint --strict --reporter github-actions-logging
 
   format-check:
+    if: github.repository == 'fernandobelotto/WindowCleaner' && github.repository_owner == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.user.login == 'fernandobelotto')
     name: Format Check
-    runs-on: macos-15
-    timeout-minutes: 10
+    runs-on: [self-hosted, macOS, ARM64, ci-build, windowcleaner-build]
+    timeout-minutes: 90
 
+    defaults:
+      run:
+        shell: /opt/homebrew/bin/python3 /Users/fernando/ci-tools/serial-shell.py {0}
+    env:
+      DEVELOPER_DIR: /Users/fernando/ci-tools/Xcode.app/Contents/Developer
     steps:
+      - name: Use provisioned build tools
+        run: |
+          echo /opt/homebrew/bin >> "$GITHUB_PATH"
+          test -x "$DEVELOPER_DIR/usr/bin/xcodebuild"
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-      - name: Install SwiftFormat
-        run: brew install swiftformat
+      - name: Verify provisioned SwiftFormat
+        run: swiftformat --version
 
       - name: Check Formatting
         run: |
