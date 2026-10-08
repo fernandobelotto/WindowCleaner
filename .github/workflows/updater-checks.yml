@@ -12,7 +12,7 @@ jobs:
   updater:
     if: github.repository == 'fernandobelotto/WindowCleaner' && github.repository_owner == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor == 'fernandobelotto' && (github.event_name != 'pull_request' || github.event.pull_request.user.login == 'fernandobelotto')
     runs-on: [self-hosted, macOS, ARM64, ci-build, windowcleaner-build]
-    timeout-minutes: 30
+    timeout-minutes: 90
     defaults:
       run:
         shell: /opt/homebrew/bin/python3 /Users/fernando/ci-tools/serial-shell.py {0}
