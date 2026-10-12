@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Bundle Identification -->
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+
+	<key>CFBundleDisplayName</key>
+	<string>Window Cleaner</string>
+
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+
+	<!-- Version Info -->
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+
+	<!-- Privacy Usage Descriptions -->
+	<key>NSAccessibilityUsageDescription</key>
+	<string>Window Cleaner needs accessibility access to count windows and manage running applications.</string>
+
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Window Cleaner needs automation access to quit applications on your behalf.</string>
+
+	<!-- Application Configuration -->
+	<key>NSApplicationSupportsSecureRestorableState</key>
+	<true/>
+
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+
+	<key>NSHighResolutionCapable</key>
+	<true/>
+
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+
+	<key>LSMinimumSystemVersion</key>
+	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+</dict>
+</plist>

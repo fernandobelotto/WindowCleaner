@@ -1,0 +1,10 @@
+{
+  "repository": "fernandobelotto/WindowCleaner",
+  "project": "WindowCleaner",
+  "product": "WindowCleaner",
+  "scheme": "WindowCleaner",
+  "asset": "WindowCleaner",
+  "entitlements": "WindowCleaner/WindowCleaner.entitlements",
+  "info": "WindowCleaner/Info.plist",
+  "bundle": "com.fernandobelotto.WindowCleaner"
+}
