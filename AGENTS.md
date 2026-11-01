@@ -22,3 +22,7 @@ Every feature, bug fix, and architecture decision is tracked on GitHub so the re
 ## Pull requests
 
 - After opening a PR in a personal repository under github.com/fernandobelotto, turn on the app's CI auto-fix and auto-merge for it (bind the PR to the session if needed).
+
+## Apple agent skills
+
+Use `.agents/skills/swiftui-pro/SKILL.md` for SwiftUI review, `.agents/skills/swift-concurrency/SKILL.md` for concurrency and `.agents/skills/swift-testing-expert/SKILL.md` for Swift Testing. For build workflow work, consult the user's locally installed AppCreator and xcode-makefiles skills when available. Preserve the existing Makefile and scripts; do not scaffold or overwrite project tooling.
